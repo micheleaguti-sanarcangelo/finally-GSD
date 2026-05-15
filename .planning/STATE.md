@@ -7,7 +7,7 @@
 ## Current Phase
 
 **Phase 2 — Portfolio & Trading API**  
-Status: Context gathered — ready to plan  
+Status: Planned — ready to execute  
 
 ## Phase Progress
 
@@ -15,7 +15,7 @@ Status: Context gathered — ready to plan
 |-------|------|--------|
 | ✓ | Market Data Backend | Complete |
 | ✓ | Database & App Foundation | Complete |
-| 2 | Portfolio & Trading API | Not Started |
+| 2 | Portfolio & Trading API | Planned |
 | 3 | LLM Chat Integration | Not Started |
 | 4 | Frontend | Not Started |
 | 5 | Docker & Deployment | Not Started |
@@ -24,5 +24,5 @@ Status: Context gathered — ready to plan
 ## Next Command
 
 ```
-/gsd-plan-phase 2
+/gsd-execute-phase 2
 ```
