@@ -25,8 +25,7 @@ def init_db(db_path: Path | None = None) -> None:
 
     db_path.parent.mkdir(parents=True, exist_ok=True)
 
-    conn = sqlite3.connect(db_path)
-    try:
+    with sqlite3.connect(db_path) as conn:
         conn.executescript("""
             CREATE TABLE IF NOT EXISTS users_profile (
                 id TEXT PRIMARY KEY,
@@ -91,7 +90,3 @@ def init_db(db_path: Path | None = None) -> None:
                 "INSERT OR IGNORE INTO watchlist (id, user_id, ticker, added_at) VALUES (?, ?, ?, ?)",
                 (str(uuid.uuid4()), "default", ticker, now),
             )
-
-        conn.commit()
-    finally:
-        conn.close()
