@@ -31,7 +31,7 @@
 **Plans:** 2 plans
 
 Plans:
-- [ ] 01-01-PLAN.md — SQLite database module: schema init, seeding, unit tests
+- [x] 01-01-PLAN.md — SQLite database module: schema init, seeding, unit tests
 - [ ] 01-02-PLAN.md — FastAPI app entrypoint: lifespan, health endpoint, SSE router wiring
 
 **Success Criteria:**
