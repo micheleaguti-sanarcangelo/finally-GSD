@@ -24,5 +24,5 @@ Status: Not Started
 ## Next Command
 
 ```
-/gsd-discuss-phase 3
+/gsd-plan-phase 3
 ```
