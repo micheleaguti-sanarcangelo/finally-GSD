@@ -56,6 +56,12 @@
 
 **Requirements:** API-07, LLM-01 through LLM-06
 
+**Plans:** 2 plans
+
+Plans:
+- [ ] 03-01-PLAN.md — Add litellm dependency and implement backend/app/api/chat.py (full LLM pipeline)
+- [ ] 03-02-PLAN.md — Register chat router in main.py and write pytest test suite
+
 **Success Criteria:**
 - `POST /api/chat {"message": "buy 5 AAPL"}` returns structured JSON and executes the trade
 - `LLM_MOCK=true` returns consistent mock response without calling OpenRouter
