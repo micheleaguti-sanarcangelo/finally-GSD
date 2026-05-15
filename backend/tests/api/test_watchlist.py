@@ -33,6 +33,8 @@ def mock_source():
 @contextmanager
 def _patched_client(db_path, mock_cache, mock_source):
     with patch("app.api.watchlist.get_db_path", return_value=db_path), \
+         patch("app.api.portfolio.get_db_path", return_value=db_path), \
+         patch("app.main.get_db_path", return_value=db_path), \
          patch("app.state.price_cache", mock_cache), \
          patch("app.state.market_source", mock_source):
         from app.main import app

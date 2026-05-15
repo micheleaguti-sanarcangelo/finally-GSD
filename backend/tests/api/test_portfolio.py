@@ -2,7 +2,7 @@
 
 import sqlite3
 from contextlib import contextmanager
-from unittest.mock import MagicMock, patch
+from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 from fastapi.testclient import TestClient
@@ -29,15 +29,16 @@ def mock_cache():
 
 @contextmanager
 def _patched_client(db_path, mock_cache):
-    """TestClient with db and cache patched to test fixtures."""
+    """TestClient with db, cache, and market source patched to test fixtures."""
     import app.state as _state
+    mock_source = AsyncMock()
     with patch("app.api.portfolio.get_db_path", return_value=db_path), \
          patch("app.main.get_db_path", return_value=db_path), \
-         patch("app.state.price_cache", mock_cache):
+         patch("app.state.price_cache", mock_cache), \
+         patch("app.state.market_source", mock_source):
         from app.main import app
         with TestClient(app) as c:
             yield c
-    # Reset snapshot_task so other tests see the initial None value
     _state.snapshot_task = None
 
 
@@ -150,7 +151,7 @@ def test_snapshot_after_trade(db_path, mock_cache):
         c.post("/api/portfolio/trade", json={"ticker": "AAPL", "quantity": 1.0, "side": "buy"})
     with sqlite3.connect(db_path) as conn:
         count = conn.execute("SELECT COUNT(*) FROM portfolio_snapshots").fetchone()[0]
-    assert count >= 1
+    assert count == 1
 
 
 def test_get_history(db_path, mock_cache):
@@ -172,4 +173,4 @@ def test_record_portfolio_snapshot(db_path, mock_cache):
     with sqlite3.connect(db_path) as conn:
         row = conn.execute("SELECT total_value FROM portfolio_snapshots").fetchone()
     assert row is not None
-    assert row[0] > 0
+    assert row[0] == pytest.approx(10000.0)

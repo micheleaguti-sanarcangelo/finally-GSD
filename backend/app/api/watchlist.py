@@ -42,11 +42,12 @@ async def add_ticker(req: AddTickerRequest):
         ).fetchone()
         if existing:
             raise HTTPException(400, detail=f"Ticker {ticker} already in watchlist")
+    await state.market_source.add_ticker(ticker)
+    with sqlite3.connect(get_db_path()) as conn:
         conn.execute(
             "INSERT INTO watchlist (id, user_id, ticker, added_at) VALUES (?, 'default', ?, ?)",
             (str(uuid.uuid4()), ticker, datetime.now(timezone.utc).isoformat()),
         )
-    await state.market_source.add_ticker(ticker)
     return {"status": "ok", "ticker": ticker}
 
 
@@ -60,8 +61,9 @@ async def remove_ticker(ticker: str):
         ).fetchone()
         if not existing:
             raise HTTPException(404, detail=f"Ticker {ticker} not in watchlist")
+    await state.market_source.remove_ticker(ticker)
+    with sqlite3.connect(get_db_path()) as conn:
         conn.execute(
             "DELETE FROM watchlist WHERE user_id='default' AND ticker=?", (ticker,)
         )
-    await state.market_source.remove_ticker(ticker)
     return {"status": "ok", "ticker": ticker}

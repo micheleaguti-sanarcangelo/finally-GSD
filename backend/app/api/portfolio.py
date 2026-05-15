@@ -4,8 +4,10 @@ import sqlite3
 import uuid
 from datetime import datetime, timezone
 
+from typing import Literal
+
 from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 
 import app.state as state
 from app.db import get_db_path
@@ -16,7 +18,14 @@ router = APIRouter(tags=["portfolio"])
 class TradeRequest(BaseModel):
     ticker: str
     quantity: float
-    side: str
+    side: Literal["buy", "sell"]
+
+    @field_validator("quantity")
+    @classmethod
+    def quantity_must_be_positive(cls, v: float) -> float:
+        if v <= 0:
+            raise ValueError("quantity must be positive")
+        return v
 
 
 def record_portfolio_snapshot(db_path, cache) -> None:
@@ -82,6 +91,7 @@ def execute_trade(req: TradeRequest):
     db_path = get_db_path()
 
     with sqlite3.connect(db_path) as conn:
+        conn.execute("BEGIN IMMEDIATE")
         cash_row = conn.execute(
             "SELECT cash_balance FROM users_profile WHERE id='default'"
         ).fetchone()

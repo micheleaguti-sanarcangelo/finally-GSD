@@ -2,6 +2,7 @@
 
 import asyncio
 import logging
+import sqlite3
 from contextlib import asynccontextmanager
 from pathlib import Path
 
@@ -23,6 +24,7 @@ logger = logging.getLogger(__name__)
 
 
 async def snapshot_loop() -> None:
+    await asyncio.sleep(30)
     while True:
         try:
             record_portfolio_snapshot(get_db_path(), state.price_cache)
@@ -36,7 +38,12 @@ async def lifespan(app: FastAPI):
     """Startup: init DB, start market data, snapshot task. Shutdown: cancel tasks, stop market data."""
     logger.info("Starting FinAlly backend")
     init_db()
-    await state.market_source.start(list(SEED_PRICES.keys()))
+    with sqlite3.connect(get_db_path()) as conn:
+        rows = conn.execute(
+            "SELECT ticker FROM watchlist WHERE user_id='default'"
+        ).fetchall()
+    tickers_to_track = [r[0] for r in rows] or list(SEED_PRICES.keys())
+    await state.market_source.start(tickers_to_track)
     state.snapshot_task = asyncio.create_task(snapshot_loop(), name="snapshot-loop")
     yield
     logger.info("Shutting down FinAlly backend")
