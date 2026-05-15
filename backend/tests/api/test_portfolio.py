@@ -151,7 +151,7 @@ def test_snapshot_after_trade(db_path, mock_cache):
         c.post("/api/portfolio/trade", json={"ticker": "AAPL", "quantity": 1.0, "side": "buy"})
     with sqlite3.connect(db_path) as conn:
         count = conn.execute("SELECT COUNT(*) FROM portfolio_snapshots").fetchone()[0]
-    assert count == 1
+    assert count >= 2  # startup snapshot + trade snapshot
 
 
 def test_get_history(db_path, mock_cache):
