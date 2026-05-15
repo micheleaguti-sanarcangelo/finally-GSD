@@ -6,16 +6,15 @@
 
 ## Current Phase
 
-**Phase 1 — Database & App Foundation**  
-Status: Verifying  
-Plans: 2/2 complete
+**Phase 2 — Portfolio & Trading API**  
+Status: Not Started  
 
 ## Phase Progress
 
 | Phase | Name | Status |
 |-------|------|--------|
 | ✓ | Market Data Backend | Complete |
-| 1 | Database & App Foundation | Ready to execute |
+| ✓ | Database & App Foundation | Complete |
 | 2 | Portfolio & Trading API | Not Started |
 | 3 | LLM Chat Integration | Not Started |
 | 4 | Frontend | Not Started |
@@ -25,5 +24,5 @@ Plans: 2/2 complete
 ## Next Command
 
 ```
-/gsd-execute-phase 1
+/gsd-discuss-phase 2
 ```

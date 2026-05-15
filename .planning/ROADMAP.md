@@ -12,36 +12,13 @@
 **Summary:** Full market data subsystem — GBM simulator, Massive API client, thread-safe price cache, SSE streaming endpoint, factory pattern. 73 tests, 84% coverage.  
 **Artifacts:** `backend/app/market/` (8 modules), `backend/tests/market/` (6 test modules)
 
+### Phase 1 — Database & App Foundation ✓ (2026-05-15)
+**Summary:** SQLite lazy-init DB module (6 tables, idempotent seeding), FastAPI app entrypoint with lifespan, health endpoint, SSE router wiring. 78 tests passing.  
+**Artifacts:** `backend/app/db/` (init module), `backend/app/main.py`, `backend/tests/db/` (5 tests)
+
 ---
 
 ## Active Phases
-
-### Phase 1 — Database & App Foundation
-**Goal:** FastAPI app starts up, initializes SQLite lazily, integrates the existing market data module, and exposes a working health endpoint and SSE stream.
-
-**Scope:**
-- FastAPI application entrypoint with lifespan startup (market data source + price cache)
-- SQLite lazy initialization: create 6 tables + seed default data on first start
-- `GET /api/health` endpoint
-- Wire existing `create_stream_router()` into FastAPI app
-- App configuration via environment variables (MASSIVE_API_KEY, LLM_MOCK)
-
-**Requirements:** DB-01 through DB-07, API-08
-
-**Plans:** 2 plans
-
-Plans:
-- [x] 01-01-PLAN.md — SQLite database module: schema init, seeding, unit tests
-- [x] 01-02-PLAN.md — FastAPI app entrypoint: lifespan, health endpoint, SSE router wiring
-
-**Success Criteria:**
-- `uv run uvicorn app.main:app` starts without error
-- `GET /api/health` returns `{"status": "ok"}`
-- `GET /api/stream/prices` streams price updates for all 10 default tickers
-- Fresh `db/finally.db` is created with all tables and seed data on first run
-- Existing market data tests still pass
-
----
 
 ### Phase 2 — Portfolio & Trading API
 **Goal:** Full REST API for portfolio management, trade execution, and watchlist CRUD — the complete backend minus chat.
@@ -160,7 +137,7 @@ Plans:
 | Phase | Name | Requirements | Status |
 |-------|------|-------------|--------|
 | ✓ | Market Data Backend | Market data, SSE, cache, tests | Complete |
-| 1 | Database & App Foundation | DB-01–07, API-08 | In Progress |
+| 1 | Database & App Foundation | DB-01–07, API-08 | Complete ✓ |
 | 2 | Portfolio & Trading API | API-01–06, TRADE-01–05 | Pending |
 | 3 | LLM Chat Integration | API-07, LLM-01–06 | Pending |
 | 4 | Frontend | UI-01–10 | Pending |
