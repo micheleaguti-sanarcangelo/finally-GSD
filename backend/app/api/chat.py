@@ -1,20 +1,23 @@
 """LLM chat API route."""
 
 import json
+import logging
 import os
 import sqlite3
 import uuid
 from datetime import datetime, timezone
+from typing import Literal
 
 from fastapi import APIRouter
 from litellm import completion
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 
 import app.state as state
 from app.api.portfolio import record_portfolio_snapshot
 from app.db import get_db_path
 
 router = APIRouter(tags=["chat"])
+logger = logging.getLogger(__name__)
 
 MODEL = "openrouter/openai/gpt-oss-120b"
 EXTRA_BODY = {"provider": {"order": ["cerebras"]}}
@@ -26,8 +29,15 @@ class ChatRequest(BaseModel):
 
 class TradeAction(BaseModel):
     ticker: str
-    side: str
+    side: Literal["buy", "sell"]
     quantity: float
+
+    @field_validator("quantity")
+    @classmethod
+    def quantity_positive(cls, v: float) -> float:
+        if v <= 0:
+            raise ValueError("quantity must be positive")
+        return v
 
 
 class WatchlistChange(BaseModel):
@@ -88,7 +98,7 @@ def _build_system_prompt(db_path: str, cache) -> str:
         f"Watchlist:\n{watchlist_section}\n\n"
         "Respond with JSON: {\"message\": \"...\", \"trades\": [], \"watchlist_changes\": []}\n"
         "trades items: {\"ticker\": \"AAPL\", \"side\": \"buy\", \"quantity\": 10}\n"
-        "watchlist_changes items: {\"ticker\": \"PYPL\", \"action\": \"add\"} or {\"action\": \"remove\"}"
+        "watchlist_changes items: {\"ticker\": \"PYPL\", \"action\": \"add\"} or {\"ticker\": \"PYPL\", \"action\": \"remove\"}"
     )
 
 
@@ -105,20 +115,13 @@ async def chat(req: ChatRequest):
             watchlist_changes=[WatchlistChange(ticker="PYPL", action="add")],
         )
     else:
-        # D-13: persist user message before LLM call
-        now = datetime.now(timezone.utc).isoformat()
-        with sqlite3.connect(db_path) as conn:
-            conn.execute(
-                "INSERT INTO chat_messages (id, user_id, role, content, actions, created_at) "
-                "VALUES (?, 'default', 'user', ?, NULL, ?)",
-                (str(uuid.uuid4()), req.message, now),
-            )
-
-        # D-03: load conversation history (last 20 messages)
+        # D-03: load most recent 20 messages in chronological order
         with sqlite3.connect(db_path) as conn:
             history = conn.execute(
-                "SELECT role, content FROM chat_messages WHERE user_id='default' "
-                "ORDER BY created_at ASC LIMIT 20"
+                "SELECT role, content FROM ("
+                "  SELECT role, content, created_at FROM chat_messages "
+                "  WHERE user_id='default' ORDER BY created_at DESC LIMIT 20"
+                ") ORDER BY created_at ASC"
             ).fetchall()
 
         # D-11: build system prompt with live portfolio context
@@ -141,21 +144,21 @@ async def chat(req: ChatRequest):
             )
             result = LLMResponse.model_validate_json(response.choices[0].message.content)
         except Exception:
+            logger.exception("LLM call or parse failed")
             result = LLMResponse(
                 message="I'm temporarily unavailable. Please try again.",
                 trades=[],
                 watchlist_changes=[],
             )
 
-    # D-13: persist user message in mock mode too
-    if os.getenv("LLM_MOCK", "").lower() == "true":
-        now = datetime.now(timezone.utc).isoformat()
-        with sqlite3.connect(db_path) as conn:
-            conn.execute(
-                "INSERT INTO chat_messages (id, user_id, role, content, actions, created_at) "
-                "VALUES (?, 'default', 'user', ?, NULL, ?)",
-                (str(uuid.uuid4()), req.message, now),
-            )
+    # D-13: persist user message once, after result is determined
+    now = datetime.now(timezone.utc).isoformat()
+    with sqlite3.connect(db_path) as conn:
+        conn.execute(
+            "INSERT INTO chat_messages (id, user_id, role, content, actions, created_at) "
+            "VALUES (?, 'default', 'user', ?, NULL, ?)",
+            (str(uuid.uuid4()), req.message, now),
+        )
 
     actions_log: list[str] = []
     now = datetime.now(timezone.utc).isoformat()
@@ -171,7 +174,6 @@ async def chat(req: ChatRequest):
             continue
         try:
             with sqlite3.connect(db_path) as conn:
-                conn.execute("BEGIN IMMEDIATE")
                 cash_row = conn.execute(
                     "SELECT cash_balance FROM users_profile WHERE id='default'"
                 ).fetchone()
@@ -184,11 +186,10 @@ async def chat(req: ChatRequest):
                 if side == "buy":
                     cost = quantity * price
                     if cash < cost:
-                        actions_log.append(
+                        raise ValueError(
                             f"Trade failed buy {quantity} {ticker}: insufficient cash "
                             f"(need ${cost:.2f}, have ${cash:.2f})"
                         )
-                        continue
                     if pos_row:
                         old_qty, old_avg = pos_row
                         new_qty = old_qty + quantity
@@ -212,11 +213,10 @@ async def chat(req: ChatRequest):
                 elif side == "sell":
                     existing_qty = pos_row[0] if pos_row else 0.0
                     if existing_qty < quantity:
-                        actions_log.append(
+                        raise ValueError(
                             f"Trade failed sell {quantity} {ticker}: "
                             f"only {existing_qty:.4g} shares held"
                         )
-                        continue
                     new_qty = existing_qty - quantity
                     if new_qty <= 1e-9:
                         conn.execute(
@@ -240,6 +240,8 @@ async def chat(req: ChatRequest):
                     (str(uuid.uuid4()), "default", ticker, side, quantity, price, now),
                 )
             actions_log.append(f"Executed {side} {quantity} {ticker} @ ${price:.2f}")
+        except ValueError as exc:
+            actions_log.append(str(exc))
         except Exception as exc:
             actions_log.append(f"Trade failed {side} {quantity} {ticker}: {exc}")
 
@@ -253,20 +255,15 @@ async def chat(req: ChatRequest):
         if change.action == "add":
             try:
                 with sqlite3.connect(db_path) as conn:
-                    existing = conn.execute(
-                        "SELECT id FROM watchlist WHERE user_id='default' AND ticker=?",
-                        (ticker,),
-                    ).fetchone()
-                    if existing:
-                        actions_log.append(f"Watchlist: {ticker} already in watchlist")
-                        continue
-                await state.market_source.add_ticker(ticker)
-                with sqlite3.connect(db_path) as conn:
-                    conn.execute(
-                        "INSERT INTO watchlist (id, user_id, ticker, added_at) "
+                    cursor = conn.execute(
+                        "INSERT OR IGNORE INTO watchlist (id, user_id, ticker, added_at) "
                         "VALUES (?, 'default', ?, ?)",
                         (str(uuid.uuid4()), ticker, datetime.now(timezone.utc).isoformat()),
                     )
+                if cursor.rowcount == 0:
+                    actions_log.append(f"Watchlist: {ticker} already in watchlist")
+                    continue
+                await state.market_source.add_ticker(ticker)
                 actions_log.append(f"Watchlist: added {ticker}")
             except Exception as exc:
                 actions_log.append(f"Watchlist add failed {ticker}: {exc}")
