@@ -58,9 +58,15 @@
 
 **Plans:** 2 plans
 
-Plans:
+**Wave 1**
 - [ ] 03-01-PLAN.md — Add litellm dependency and implement backend/app/api/chat.py (full LLM pipeline)
+
+**Wave 2** *(blocked on Wave 1 completion)*
 - [ ] 03-02-PLAN.md — Register chat router in main.py and write pytest test suite
+
+**Cross-cutting constraints:**
+- HTTP 200 always returned from POST /api/chat — no HTTPException raised in chat.py (D-01)
+- State singletons accessed via `import app.state as state` attribute pattern (mock.patch compatible)
 
 **Success Criteria:**
 - `POST /api/chat {"message": "buy 5 AAPL"}` returns structured JSON and executes the trade
