@@ -25,13 +25,12 @@ logger = logging.getLogger(__name__)
 
 
 async def snapshot_loop() -> None:
-    await asyncio.sleep(30)
     while True:
+        await asyncio.sleep(30)
         try:
             record_portfolio_snapshot(get_db_path(), state.price_cache)
         except Exception:
             logger.exception("Snapshot failed")
-        await asyncio.sleep(30)
 
 
 @asynccontextmanager
@@ -45,6 +44,10 @@ async def lifespan(app: FastAPI):
         ).fetchall()
     tickers_to_track = [r[0] for r in rows] or list(SEED_PRICES.keys())
     await state.market_source.start(tickers_to_track)
+    try:
+        record_portfolio_snapshot(get_db_path(), state.price_cache)
+    except Exception:
+        logger.exception("Initial snapshot failed")
     state.snapshot_task = asyncio.create_task(snapshot_loop(), name="snapshot-loop")
     yield
     logger.info("Shutting down FinAlly backend")
