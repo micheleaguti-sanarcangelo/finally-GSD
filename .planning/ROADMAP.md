@@ -28,6 +28,12 @@
 
 **Requirements:** DB-01 through DB-07, API-08
 
+**Plans:** 2 plans
+
+Plans:
+- [ ] 01-01-PLAN.md — SQLite database module: schema init, seeding, unit tests
+- [ ] 01-02-PLAN.md — FastAPI app entrypoint: lifespan, health endpoint, SSE router wiring
+
 **Success Criteria:**
 - `uv run uvicorn app.main:app` starts without error
 - `GET /api/health` returns `{"status": "ok"}`
@@ -154,7 +160,7 @@
 | Phase | Name | Requirements | Status |
 |-------|------|-------------|--------|
 | ✓ | Market Data Backend | Market data, SSE, cache, tests | Complete |
-| 1 | Database & App Foundation | DB-01–07, API-08 | Pending |
+| 1 | Database & App Foundation | DB-01–07, API-08 | In Progress |
 | 2 | Portfolio & Trading API | API-01–06, TRADE-01–05 | Pending |
 | 3 | LLM Chat Integration | API-07, LLM-01–06 | Pending |
 | 4 | Frontend | UI-01–10 | Pending |
