@@ -1,5 +1,6 @@
 """FinAlly FastAPI application entrypoint."""
 
+import asyncio
 import logging
 from contextlib import asynccontextmanager
 from pathlib import Path
@@ -11,7 +12,8 @@ from fastapi import FastAPI
 load_dotenv(Path(__file__).parent.parent.parent / ".env")
 
 import app.state as state  # noqa: E402
-from app.db import init_db  # noqa: E402
+from app.api.portfolio import record_portfolio_snapshot, router as portfolio_router  # noqa: E402
+from app.db import get_db_path, init_db  # noqa: E402
 from app.market import create_stream_router  # noqa: E402
 from app.market.seed_prices import SEED_PRICES  # noqa: E402
 
@@ -19,14 +21,30 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
+async def snapshot_loop() -> None:
+    while True:
+        try:
+            record_portfolio_snapshot(get_db_path(), state.price_cache)
+        except Exception:
+            logger.exception("Snapshot failed")
+        await asyncio.sleep(30)
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Startup: init DB, start market data. Shutdown: stop market data."""
+    """Startup: init DB, start market data, snapshot task. Shutdown: cancel tasks, stop market data."""
     logger.info("Starting FinAlly backend")
     init_db()
     await state.market_source.start(list(SEED_PRICES.keys()))
+    state.snapshot_task = asyncio.create_task(snapshot_loop(), name="snapshot-loop")
     yield
     logger.info("Shutting down FinAlly backend")
+    if state.snapshot_task and not state.snapshot_task.done():
+        state.snapshot_task.cancel()
+        try:
+            await state.snapshot_task
+        except asyncio.CancelledError:
+            pass
     await state.market_source.stop()
 
 
@@ -34,6 +52,7 @@ app = FastAPI(title="FinAlly", lifespan=lifespan)
 
 stream_router = create_stream_router(state.price_cache)
 app.include_router(stream_router)
+app.include_router(portfolio_router, prefix="/api")
 
 
 @app.get("/api/health")

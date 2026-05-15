@@ -1,12 +1,13 @@
 """Tests for portfolio API routes and trade logic."""
 
 import sqlite3
+from contextlib import contextmanager
 from unittest.mock import MagicMock, patch
 
 import pytest
 from fastapi.testclient import TestClient
 
-from app.db.init_db import get_db_path, init_db
+from app.db.init_db import init_db
 
 
 @pytest.fixture
@@ -26,21 +27,23 @@ def mock_cache():
     return cache
 
 
-@pytest.fixture
-def client(db_path, mock_cache):
-    with patch("app.db.init_db.get_db_path", return_value=db_path), \
+@contextmanager
+def _patched_client(db_path, mock_cache):
+    """TestClient with db and cache patched to test fixtures."""
+    import app.state as _state
+    with patch("app.api.portfolio.get_db_path", return_value=db_path), \
+         patch("app.main.get_db_path", return_value=db_path), \
          patch("app.state.price_cache", mock_cache):
         from app.main import app
         with TestClient(app) as c:
             yield c
+    # Reset snapshot_task so other tests see the initial None value
+    _state.snapshot_task = None
 
 
 def test_get_portfolio_empty(db_path, mock_cache):
-    with patch("app.db.init_db.get_db_path", return_value=db_path), \
-         patch("app.state.price_cache", mock_cache):
-        from app.main import app
-        with TestClient(app) as c:
-            resp = c.get("/api/portfolio")
+    with _patched_client(db_path, mock_cache) as c:
+        resp = c.get("/api/portfolio")
     assert resp.status_code == 200
     data = resp.json()
     assert data["positions"] == []
@@ -55,11 +58,8 @@ def test_get_portfolio(db_path, mock_cache):
             "INSERT OR REPLACE INTO positions (id, user_id, ticker, quantity, avg_cost, updated_at) VALUES (?,?,?,?,?,?)",
             (str(uuid.uuid4()), "default", "AAPL", 10.0, 100.0, datetime.now(timezone.utc).isoformat()),
         )
-    with patch("app.db.init_db.get_db_path", return_value=db_path), \
-         patch("app.state.price_cache", mock_cache):
-        from app.main import app
-        with TestClient(app) as c:
-            resp = c.get("/api/portfolio")
+    with _patched_client(db_path, mock_cache) as c:
+        resp = c.get("/api/portfolio")
     assert resp.status_code == 200
     data = resp.json()
     assert len(data["positions"]) == 1
@@ -70,11 +70,8 @@ def test_get_portfolio(db_path, mock_cache):
 
 
 def test_execute_buy(db_path, mock_cache):
-    with patch("app.db.init_db.get_db_path", return_value=db_path), \
-         patch("app.state.price_cache", mock_cache):
-        from app.main import app
-        with TestClient(app) as c:
-            resp = c.post("/api/portfolio/trade", json={"ticker": "AAPL", "quantity": 5.0, "side": "buy"})
+    with _patched_client(db_path, mock_cache) as c:
+        resp = c.post("/api/portfolio/trade", json={"ticker": "AAPL", "quantity": 5.0, "side": "buy"})
     assert resp.status_code == 200
     with sqlite3.connect(db_path) as conn:
         row = conn.execute("SELECT quantity, avg_cost FROM positions WHERE ticker='AAPL'").fetchone()
@@ -84,13 +81,11 @@ def test_execute_buy(db_path, mock_cache):
 
 
 def test_avg_cost_calculation(db_path, mock_cache):
-    mock_cache.get_price.side_effect = [100.0, 120.0, 100.0, 120.0]
-    with patch("app.db.init_db.get_db_path", return_value=db_path), \
-         patch("app.state.price_cache", mock_cache):
-        from app.main import app
-        with TestClient(app) as c:
-            c.post("/api/portfolio/trade", json={"ticker": "AAPL", "quantity": 10.0, "side": "buy"})
-            c.post("/api/portfolio/trade", json={"ticker": "AAPL", "quantity": 5.0, "side": "buy"})
+    # trade1 price=100, snapshot1 price=100, trade2 price=120, snapshot2 price=120
+    mock_cache.get_price.side_effect = [100.0, 100.0, 120.0, 120.0]
+    with _patched_client(db_path, mock_cache) as c:
+        c.post("/api/portfolio/trade", json={"ticker": "AAPL", "quantity": 10.0, "side": "buy"})
+        c.post("/api/portfolio/trade", json={"ticker": "AAPL", "quantity": 5.0, "side": "buy"})
     with sqlite3.connect(db_path) as conn:
         row = conn.execute("SELECT quantity, avg_cost FROM positions WHERE ticker='AAPL'").fetchone()
     assert row[0] == pytest.approx(15.0)
@@ -99,12 +94,9 @@ def test_avg_cost_calculation(db_path, mock_cache):
 
 
 def test_execute_sell(db_path, mock_cache):
-    with patch("app.db.init_db.get_db_path", return_value=db_path), \
-         patch("app.state.price_cache", mock_cache):
-        from app.main import app
-        with TestClient(app) as c:
-            c.post("/api/portfolio/trade", json={"ticker": "AAPL", "quantity": 10.0, "side": "buy"})
-            resp = c.post("/api/portfolio/trade", json={"ticker": "AAPL", "quantity": 3.0, "side": "sell"})
+    with _patched_client(db_path, mock_cache) as c:
+        c.post("/api/portfolio/trade", json={"ticker": "AAPL", "quantity": 10.0, "side": "buy"})
+        resp = c.post("/api/portfolio/trade", json={"ticker": "AAPL", "quantity": 3.0, "side": "sell"})
     assert resp.status_code == 200
     with sqlite3.connect(db_path) as conn:
         row = conn.execute("SELECT quantity FROM positions WHERE ticker='AAPL'").fetchone()
@@ -112,12 +104,9 @@ def test_execute_sell(db_path, mock_cache):
 
 
 def test_sell_full_position(db_path, mock_cache):
-    with patch("app.db.init_db.get_db_path", return_value=db_path), \
-         patch("app.state.price_cache", mock_cache):
-        from app.main import app
-        with TestClient(app) as c:
-            c.post("/api/portfolio/trade", json={"ticker": "AAPL", "quantity": 5.0, "side": "buy"})
-            resp = c.post("/api/portfolio/trade", json={"ticker": "AAPL", "quantity": 5.0, "side": "sell"})
+    with _patched_client(db_path, mock_cache) as c:
+        c.post("/api/portfolio/trade", json={"ticker": "AAPL", "quantity": 5.0, "side": "buy"})
+        resp = c.post("/api/portfolio/trade", json={"ticker": "AAPL", "quantity": 5.0, "side": "sell"})
     assert resp.status_code == 200
     with sqlite3.connect(db_path) as conn:
         row = conn.execute("SELECT quantity FROM positions WHERE ticker='AAPL'").fetchone()
@@ -126,33 +115,24 @@ def test_sell_full_position(db_path, mock_cache):
 
 def test_buy_insufficient_cash(db_path, mock_cache):
     mock_cache.get_price.return_value = 1000.0
-    with patch("app.db.init_db.get_db_path", return_value=db_path), \
-         patch("app.state.price_cache", mock_cache):
-        from app.main import app
-        with TestClient(app) as c:
-            resp = c.post("/api/portfolio/trade", json={"ticker": "AAPL", "quantity": 100.0, "side": "buy"})
+    with _patched_client(db_path, mock_cache) as c:
+        resp = c.post("/api/portfolio/trade", json={"ticker": "AAPL", "quantity": 100.0, "side": "buy"})
     assert resp.status_code == 400
     assert "Insufficient cash" in resp.json()["detail"]
 
 
 def test_sell_insufficient_shares(db_path, mock_cache):
-    with patch("app.db.init_db.get_db_path", return_value=db_path), \
-         patch("app.state.price_cache", mock_cache):
-        from app.main import app
-        with TestClient(app) as c:
-            c.post("/api/portfolio/trade", json={"ticker": "AAPL", "quantity": 5.0, "side": "buy"})
-            resp = c.post("/api/portfolio/trade", json={"ticker": "AAPL", "quantity": 10.0, "side": "sell"})
+    with _patched_client(db_path, mock_cache) as c:
+        c.post("/api/portfolio/trade", json={"ticker": "AAPL", "quantity": 5.0, "side": "buy"})
+        resp = c.post("/api/portfolio/trade", json={"ticker": "AAPL", "quantity": 10.0, "side": "sell"})
     assert resp.status_code == 400
     assert "Insufficient shares" in resp.json()["detail"]
 
 
 def test_trade_uses_cache_price(db_path, mock_cache):
     mock_cache.get_price.return_value = 200.0
-    with patch("app.db.init_db.get_db_path", return_value=db_path), \
-         patch("app.state.price_cache", mock_cache):
-        from app.main import app
-        with TestClient(app) as c:
-            c.post("/api/portfolio/trade", json={"ticker": "AAPL", "quantity": 1.0, "side": "buy"})
+    with _patched_client(db_path, mock_cache) as c:
+        c.post("/api/portfolio/trade", json={"ticker": "AAPL", "quantity": 1.0, "side": "buy"})
     with sqlite3.connect(db_path) as conn:
         row = conn.execute("SELECT price FROM trades WHERE ticker='AAPL'").fetchone()
     assert row[0] == pytest.approx(200.0)
@@ -160,32 +140,23 @@ def test_trade_uses_cache_price(db_path, mock_cache):
 
 def test_price_unavailable_503(db_path, mock_cache):
     mock_cache.get_price.return_value = None
-    with patch("app.db.init_db.get_db_path", return_value=db_path), \
-         patch("app.state.price_cache", mock_cache):
-        from app.main import app
-        with TestClient(app) as c:
-            resp = c.post("/api/portfolio/trade", json={"ticker": "XYZ", "quantity": 1.0, "side": "buy"})
+    with _patched_client(db_path, mock_cache) as c:
+        resp = c.post("/api/portfolio/trade", json={"ticker": "XYZ", "quantity": 1.0, "side": "buy"})
     assert resp.status_code == 503
 
 
 def test_snapshot_after_trade(db_path, mock_cache):
-    with patch("app.db.init_db.get_db_path", return_value=db_path), \
-         patch("app.state.price_cache", mock_cache):
-        from app.main import app
-        with TestClient(app) as c:
-            c.post("/api/portfolio/trade", json={"ticker": "AAPL", "quantity": 1.0, "side": "buy"})
+    with _patched_client(db_path, mock_cache) as c:
+        c.post("/api/portfolio/trade", json={"ticker": "AAPL", "quantity": 1.0, "side": "buy"})
     with sqlite3.connect(db_path) as conn:
         count = conn.execute("SELECT COUNT(*) FROM portfolio_snapshots").fetchone()[0]
     assert count >= 1
 
 
 def test_get_history(db_path, mock_cache):
-    with patch("app.db.init_db.get_db_path", return_value=db_path), \
-         patch("app.state.price_cache", mock_cache):
-        from app.main import app
-        with TestClient(app) as c:
-            c.post("/api/portfolio/trade", json={"ticker": "AAPL", "quantity": 1.0, "side": "buy"})
-            resp = c.get("/api/portfolio/history")
+    with _patched_client(db_path, mock_cache) as c:
+        c.post("/api/portfolio/trade", json={"ticker": "AAPL", "quantity": 1.0, "side": "buy"})
+        resp = c.get("/api/portfolio/history")
     assert resp.status_code == 200
     data = resp.json()
     assert "history" in data
