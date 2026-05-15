@@ -6,8 +6,8 @@
 
 ## Current Phase
 
-**Phase 2 — Portfolio & Trading API**  
-Status: Planned — ready to execute  
+**Phase 3 — LLM Chat Integration**  
+Status: Not Started  
 
 ## Phase Progress
 
@@ -15,7 +15,7 @@ Status: Planned — ready to execute
 |-------|------|--------|
 | ✓ | Market Data Backend | Complete |
 | ✓ | Database & App Foundation | Complete |
-| 2 | Portfolio & Trading API | Planned |
+| ✓ | Portfolio & Trading API | Complete |
 | 3 | LLM Chat Integration | Not Started |
 | 4 | Frontend | Not Started |
 | 5 | Docker & Deployment | Not Started |
@@ -24,5 +24,5 @@ Status: Planned — ready to execute
 ## Next Command
 
 ```
-/gsd-execute-phase 2
+/gsd-discuss-phase 3
 ```
