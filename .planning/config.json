@@ -1,0 +1,8 @@
+{
+  "mode": "yolo",
+  "granularity": "medium",
+  "research": false,
+  "plan_check": true,
+  "verifier": true,
+  "git_tracking": true
+}
