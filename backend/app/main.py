@@ -13,6 +13,7 @@ from fastapi import FastAPI
 load_dotenv(Path(__file__).parent.parent.parent / ".env")
 
 import app.state as state  # noqa: E402
+from app.api.chat import router as chat_router  # noqa: E402
 from app.api.portfolio import record_portfolio_snapshot, router as portfolio_router  # noqa: E402
 from app.api.watchlist import router as watchlist_router  # noqa: E402
 from app.db import get_db_path, init_db  # noqa: E402
@@ -62,6 +63,7 @@ stream_router = create_stream_router(state.price_cache)
 app.include_router(stream_router)
 app.include_router(portfolio_router, prefix="/api")
 app.include_router(watchlist_router, prefix="/api")
+app.include_router(chat_router, prefix="/api")
 
 
 @app.get("/api/health")
