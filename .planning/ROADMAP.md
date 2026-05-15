@@ -32,7 +32,7 @@
 
 Plans:
 - [x] 01-01-PLAN.md — SQLite database module: schema init, seeding, unit tests
-- [ ] 01-02-PLAN.md — FastAPI app entrypoint: lifespan, health endpoint, SSE router wiring
+- [x] 01-02-PLAN.md — FastAPI app entrypoint: lifespan, health endpoint, SSE router wiring
 
 **Success Criteria:**
 - `uv run uvicorn app.main:app` starts without error
