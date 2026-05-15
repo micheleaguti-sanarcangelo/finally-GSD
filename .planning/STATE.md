@@ -7,7 +7,7 @@
 ## Current Phase
 
 **Phase 2 — Portfolio & Trading API**  
-Status: Not Started  
+Status: Context gathered — ready to plan  
 
 ## Phase Progress
 
@@ -24,5 +24,5 @@ Status: Not Started
 ## Next Command
 
 ```
-/gsd-discuss-phase 2
+/gsd-plan-phase 2
 ```
