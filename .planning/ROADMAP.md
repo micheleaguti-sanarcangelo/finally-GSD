@@ -42,7 +42,7 @@
 
 ### Phases
 
-- [ ] **Phase 7: Multilingual Chat** — Update AI system prompt so the LLM detects and matches user language automatically
+- [x] **Phase 7: Multilingual Chat** — Update AI system prompt so the LLM detects and matches user language automatically
 
 ### Phase Details
 
@@ -63,7 +63,7 @@
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 7. Multilingual Chat | 0/1 | Not started | - |
+| 7. Multilingual Chat | 1/1 | Complete | 2026-05-16 |
 
 ---
 
