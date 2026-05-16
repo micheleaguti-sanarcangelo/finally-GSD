@@ -2,6 +2,7 @@
 
 import asyncio
 import logging
+import os
 import sqlite3
 from contextlib import asynccontextmanager
 from pathlib import Path
@@ -11,8 +12,10 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
-# Load .env from project root before any env var reads
-load_dotenv(Path(__file__).parent.parent.parent / ".env")
+# Load .env from project root for local development; Docker injects vars via --env-file
+_env_file = Path(__file__).parent.parent.parent / ".env"
+if _env_file.exists():
+    load_dotenv(_env_file)
 
 STATIC_DIR = Path("/app/static")
 
@@ -41,6 +44,8 @@ async def snapshot_loop() -> None:
 async def lifespan(app: FastAPI):
     """Startup: init DB, start market data, snapshot task. Shutdown: cancel tasks, stop market data."""
     logger.info("Starting FinAlly backend")
+    if not os.environ.get("OPENROUTER_API_KEY"):
+        logger.warning("OPENROUTER_API_KEY is not set — chat endpoint will fail")
     init_db()
     with sqlite3.connect(get_db_path()) as conn:
         rows = conn.execute(
