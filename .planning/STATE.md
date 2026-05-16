@@ -22,7 +22,7 @@ progress:
 ## Current Phase
 
 **Phase 5 — Docker & Deployment**  
-Status: Not Started  
+Status: Ready to Execute (2 plans)  
 Last Activity: 2026-05-16
 
 ## Completed: Phase 3 — LLM Chat Integration (2026-05-16)
@@ -95,8 +95,8 @@ Last Activity: 2026-05-16
 
 ## Next Steps
 
-Discuss and plan Phase 5: Docker & Deployment.
+Execute Phase 5: Docker & Deployment.
 
 ```
-/gsd-discuss-phase 5
+/gsd-execute-phase 5
 ```
