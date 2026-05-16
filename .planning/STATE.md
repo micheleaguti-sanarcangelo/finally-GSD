@@ -24,7 +24,7 @@ progress:
 Phase: Phase 7 — Multilingual Chat
 Plan: 07-01-PLAN.md
 Status: Complete
-Last activity: 2026-05-16 — Phase 7 executed; language instruction added to _build_system_prompt()
+Last activity: 2026-05-16 — Phase 7 shipped — PR #6
 
 ## Accumulated Context
 
