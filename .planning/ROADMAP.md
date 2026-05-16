@@ -112,6 +112,12 @@ Plans:
 
 **Requirements:** TEST-01 through TEST-07
 
+**Plans:** 2 plans
+
+Plans:
+- [ ] 06-01-PLAN.md — Test infrastructure: package.json, playwright.config.ts, docker-compose.test.yml, data-testid additions to 4 components, frontend rebuild (Wave 1)
+- [ ] 06-02-PLAN.md — E2E test scenarios: test/tests/finally.spec.ts with all 7 scenarios TEST-01 through TEST-07 (Wave 2)
+
 **Success Criteria:**
 - `docker compose -f test/docker-compose.test.yml up --exit-code-from playwright` exits 0
 - All 7 scenarios pass
@@ -129,4 +135,4 @@ Plans:
 | 3 | LLM Chat Integration | API-07, LLM-01–06 | Complete ✓ |
 | 4 | Frontend | UI-01–10 | Complete ✓ |
 | 5 | Docker & Deployment | INFRA-01–06 | Complete ✓ |
-| 6 | E2E Testing | TEST-01–07 | Pending |
+| 6 | E2E Testing | TEST-01–07 | Planned (2 plans, ready to execute) |
