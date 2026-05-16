@@ -87,6 +87,12 @@ Plans:
 
 **Requirements:** INFRA-01 through INFRA-06
 
+**Plans:** 2 plans
+
+Plans:
+- [ ] 05-01-PLAN.md — Multi-stage Dockerfile + FastAPI StaticFiles mount for Next.js export
+- [ ] 05-02-PLAN.md — Start/stop scripts (Mac + Windows), docker-compose.yml, .env.example, .dockerignore
+
 **Success Criteria:**
 - `./scripts/start_mac.sh` builds image and opens `http://localhost:8000`
 - Fresh container start creates and seeds `db/finally.db` automatically
@@ -121,6 +127,6 @@ Plans:
 | 1 | Database & App Foundation | DB-01–07, API-08 | Complete ✓ |
 | 2 | Portfolio & Trading API | API-01–06, TRADE-01–05 | Complete ✓ |
 | 3 | LLM Chat Integration | API-07, LLM-01–06 | Complete ✓ |
-| 4 | Frontend | UI-01–10 | Active |
-| 5 | Docker & Deployment | INFRA-01–06 | Pending |
+| 4 | Frontend | UI-01–10 | Complete ✓ |
+| 5 | Docker & Deployment | INFRA-01–06 | Active |
 | 6 | E2E Testing | TEST-01–07 | Pending |
