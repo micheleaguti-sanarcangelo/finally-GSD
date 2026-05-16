@@ -62,6 +62,7 @@ export function TradeBar({ selectedTicker, onTradeExecuted }: TradeBarProps) {
           onChange={(e) => setTicker(e.target.value.toUpperCase())}
           placeholder="Ticker"
           maxLength={10}
+          data-testid="trade-ticker-input"
           className="flex-1 min-w-0 px-2 py-1.5 text-sm font-mono uppercase
             bg-[#1a1a2e] text-[#e2e8f0] border border-[#2a2a3a] rounded
             focus:outline-none focus:border-[#209dd7] placeholder-gray-600"
@@ -73,6 +74,7 @@ export function TradeBar({ selectedTicker, onTradeExecuted }: TradeBarProps) {
           placeholder="Qty"
           min="1"
           step="1"
+          data-testid="trade-qty-input"
           className="w-20 px-2 py-1.5 text-sm font-mono
             bg-[#1a1a2e] text-[#e2e8f0] border border-[#2a2a3a] rounded
             focus:outline-none focus:border-[#209dd7] placeholder-gray-600"
@@ -82,6 +84,7 @@ export function TradeBar({ selectedTicker, onTradeExecuted }: TradeBarProps) {
         <button
           onClick={() => executeTrade('buy')}
           disabled={loading}
+          data-testid="trade-buy-btn"
           className="flex-1 py-1.5 text-sm font-bold rounded
             bg-[#22c55e] hover:bg-[#16a34a] text-white
             disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
@@ -91,6 +94,7 @@ export function TradeBar({ selectedTicker, onTradeExecuted }: TradeBarProps) {
         <button
           onClick={() => executeTrade('sell')}
           disabled={loading}
+          data-testid="trade-sell-btn"
           className="flex-1 py-1.5 text-sm font-bold rounded
             bg-[#ef4444] hover:bg-[#dc2626] text-white
             disabled:opacity-50 disabled:cursor-not-allowed transition-colors"

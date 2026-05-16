@@ -57,7 +57,7 @@ export function Header({ totalValue, cashBalance }: HeaderProps) {
           <div style={{ fontSize: '0.65rem', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
             Cash
           </div>
-          <div style={{ fontSize: '0.95rem', fontWeight: 600, color: '#e2e8f0' }}>
+          <div style={{ fontSize: '0.95rem', fontWeight: 600, color: '#e2e8f0' }} data-testid="header-cash">
             ${formatMoney(cashBalance)}
           </div>
         </div>
@@ -73,6 +73,7 @@ export function Header({ totalValue, cashBalance }: HeaderProps) {
               transition: 'background-color 0.3s ease',
             }}
             title={status}
+            data-testid="connection-status"
           />
           <span style={{ fontSize: '0.7rem', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
             Live

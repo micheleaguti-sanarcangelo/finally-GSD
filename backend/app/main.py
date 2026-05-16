@@ -93,6 +93,27 @@ async def health():
     return {"status": "ok"}
 
 
+@app.post("/api/test/reset")
+async def test_reset():
+    """Reset DB to initial seed state — only active when LLM_MOCK=true."""
+    from fastapi import HTTPException
+
+    if os.environ.get("LLM_MOCK", "").lower() != "true":
+        raise HTTPException(status_code=403, detail="Only available in test mode")
+    db_path = get_db_path()
+    with sqlite3.connect(db_path) as conn:
+        conn.executescript("""
+            DELETE FROM trades;
+            DELETE FROM positions;
+            DELETE FROM portfolio_snapshots;
+            DELETE FROM chat_messages;
+            DELETE FROM watchlist;
+            UPDATE users_profile SET cash_balance = 10000.0;
+        """)
+    init_db()
+    return {"ok": True}
+
+
 # Serve static files only when the directory exists (production/Docker)
 # Must be registered after all API routes so /api/* routes take precedence.
 if STATIC_DIR.exists():

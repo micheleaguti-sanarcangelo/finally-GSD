@@ -214,6 +214,7 @@ export function WatchlistPanel({ selectedTicker, onSelectTicker }: WatchlistPane
           onChange={(e) => setAddInput(e.target.value.toUpperCase())}
           placeholder="Ticker"
           maxLength={10}
+          data-testid="watchlist-ticker-input"
           style={{
             flex: 1,
             backgroundColor: '#0d1117',
@@ -228,6 +229,7 @@ export function WatchlistPanel({ selectedTicker, onSelectTicker }: WatchlistPane
         />
         <button
           type="submit"
+          data-testid="watchlist-add-btn"
           style={{
             backgroundColor: '#753991',
             color: '#fff',

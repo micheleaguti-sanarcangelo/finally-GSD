@@ -164,6 +164,7 @@ export function ChatPanel({ onTradeExecuted }: ChatPanelProps) {
             onKeyDown={handleKeyDown}
             disabled={loading}
             placeholder="Ask FinAlly... (Enter to send, Shift+Enter for newline)"
+            data-testid="chat-input"
             className="flex-1 px-2 py-1.5 text-sm bg-[#1a1a2e] text-[#e2e8f0]
               border border-[#2a2a3a] rounded resize-none
               focus:outline-none focus:border-[#209dd7]
@@ -172,6 +173,7 @@ export function ChatPanel({ onTradeExecuted }: ChatPanelProps) {
           <button
             onClick={sendMessage}
             disabled={loading || !input.trim()}
+            data-testid="chat-send-btn"
             className="px-3 py-1.5 text-sm font-bold rounded
               bg-[#753991] hover:bg-[#5f2e76] text-white
               disabled:opacity-50 disabled:cursor-not-allowed transition-colors

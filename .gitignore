@@ -212,3 +212,17 @@ frontend/.next/
 frontend/out/
 frontend/package-lock.json
 frontend/next-env.d.ts
+frontend/tsconfig.tsbuildinfo
+
+# E2E test artifacts
+test/node_modules/
+test/playwright-report/
+test/test-results/
+
+# SQLite database
+db/finally.db
+
+# Screenshots and local artifacts
+*.png
+.bg-shell/
+.playwright-mcp/
