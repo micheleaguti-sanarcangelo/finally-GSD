@@ -53,6 +53,8 @@ async def lifespan(app: FastAPI):
         ).fetchall()
     tickers_to_track = [r[0] for r in rows] or list(SEED_PRICES.keys())
     await state.market_source.start(tickers_to_track)
+    # Allow first market tick to populate price cache before snapshotting
+    await asyncio.sleep(1.0)
     try:
         record_portfolio_snapshot(get_db_path(), state.price_cache)
     except Exception:
