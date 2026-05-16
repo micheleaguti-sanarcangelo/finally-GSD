@@ -11,8 +11,16 @@ $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $ProjectRoot = Split-Path -Parent $ScriptDir
 $EnvFile = Join-Path $ProjectRoot ".env"
 
+# Check .env exists before passing it to docker run
+if (-not (Test-Path $EnvFile)) {
+    Write-Host "ERROR: .env file not found at $EnvFile"
+    Write-Host "Copy .env.example to .env and fill in your API keys before starting."
+    exit 1
+}
+
 # Build image if it doesn't exist or -Build was passed
-$ImageExists = docker image inspect $Image 2>$null
+docker image inspect $Image 2>$null | Out-Null
+$ImageExists = $LASTEXITCODE -eq 0
 if ($Build -or -not $ImageExists) {
     Write-Host "Building $Image image..."
     docker build -t $Image $ProjectRoot
