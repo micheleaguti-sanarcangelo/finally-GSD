@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-last_updated: "2026-05-16T08:10:00.000Z"
+last_updated: "2026-05-16T08:30:00.000Z"
 last_activity: 2026-05-16
 progress:
   total_phases: 4
   completed_phases: 3
   total_plans: 12
-  completed_plans: 10
-  percent: 83
+  completed_plans: 11
+  percent: 92
 ---
 
 # Project State
@@ -22,7 +22,7 @@ progress:
 ## Current Phase
 
 **Phase 4 — Frontend**  
-Status: In Progress (Plan 2/5 complete)  
+Status: In Progress (Plan 3/5 complete)  
 Last Activity: 2026-05-16
 
 ## Completed: Phase 3 — LLM Chat Integration (2026-05-16)
@@ -47,6 +47,12 @@ Last Activity: 2026-05-16
 - Sparkline.tsx: pure SVG polyline from price array, min/max normalization, no library
 - WatchlistPanel.tsx: live prices from Zustand, price flash 500ms, sparkline history (60-point cap), add/remove ticker
 
+## Completed: Phase 4 Plan 03 — TradeBar, PositionsTable, ChatPanel (2026-05-16)
+
+- TradeBar.tsx: market order execution, selectedTicker prop sync, quantity validation, buy/sell buttons
+- PositionsTable.tsx: live prices from Zustand, recomputed P&L inline, empty state message
+- ChatPanel.tsx: AI conversation history, loading gate, inline trade/watchlist confirmation pills, Enter-to-submit, auto-scroll
+
 ## Phase Progress
 
 | Phase | Name | Status |
@@ -55,7 +61,7 @@ Last Activity: 2026-05-16
 | ✓ | Database & App Foundation | Complete |
 | ✓ | Portfolio & Trading API | Complete |
 | ✓ | LLM Chat Integration | Complete |
-| 4 | Frontend | In Progress (2/5) |
+| 4 | Frontend | In Progress (3/5) |
 | 5 | Docker & Deployment | Not Started |
 | 6 | E2E Testing | Not Started |
 
@@ -67,10 +73,13 @@ Last Activity: 2026-05-16
 - Sparkline is a pure function component (no 'use client') — no browser APIs, props-only
 - Flash timers stored in useRef to avoid re-renders when clearing; unmount effect clears all timers
 - Ticker input sanitized with toUpperCase().trim() + maxLength=10 per threat model T-04-03
+- TradeBar keeps ticker/quantity fields after successful trade (facilitates repeat trades same ticker)
+- PositionsTable ignores unrealized_pnl prop — recomputes live from Zustand prices to avoid staleness
+- ChatPanel shows generic error on fetch failure; no detail exposure (T-04-07)
 
 ## Next Steps
 
-Run plan 04-03: Trade bar and Chat panel.
+Run plan 04-04: Charts (MainChart, PortfolioHeatmap, PnLChart).
 
 ```
 /gsd-execute-phase 4
