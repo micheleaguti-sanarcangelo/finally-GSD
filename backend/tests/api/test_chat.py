@@ -148,6 +148,19 @@ def test_chat_history_included(db_path, mock_cache, monkeypatch):
     assert count >= 5
 
 
+def test_chat_insufficient_cash(db_path, mock_cache, monkeypatch):
+    """LLM_MOCK=true with near-zero cash: trade fails, failure message appended to response."""
+    monkeypatch.setenv("LLM_MOCK", "true")
+    with sqlite3.connect(db_path) as conn:
+        conn.execute("UPDATE users_profile SET cash_balance=0.01 WHERE id='default'")
+    with _patched_chat_client(db_path, mock_cache) as c:
+        resp = c.post("/api/chat", json={"message": "buy something"})
+    assert resp.status_code == 200
+    data = resp.json()
+    assert "insufficient cash" in data["message"]
+    assert data["trades"] == [{"ticker": "AAPL", "side": "buy", "quantity": 1.0}]
+
+
 def test_chat_fallback_persists_messages(db_path, mock_cache):
     """Fallback path still persists both user and assistant messages."""
     with patch("app.api.chat.completion", side_effect=Exception("LLM down")):
