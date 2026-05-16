@@ -7,10 +7,10 @@ last_updated: "2026-05-16T14:00:00.000Z"
 last_activity: 2026-05-16
 progress:
   total_phases: 6
-  completed_phases: 4
-  total_plans: 17
-  completed_plans: 17
-  percent: 67
+  completed_phases: 5
+  total_plans: 19
+  completed_plans: 19
+  percent: 83
 ---
 
 # Project State
@@ -21,9 +21,16 @@ progress:
 
 ## Current Phase
 
-**Phase 5 — Docker & Deployment**  
-Status: Ready to Execute (2 plans)  
+**Phase 6 — E2E Testing**  
+Status: Not Started  
 Last Activity: 2026-05-16
+
+## Completed: Phase 5 — Docker & Deployment (2026-05-16)
+
+- Plan 05-01: Multi-stage Dockerfile (node:20-slim → python:3.12-slim, 199MB), FastAPI StaticFiles mount at `/` — COMPLETE
+- Plan 05-02: start/stop scripts (Mac + Windows), docker-compose.yml, .env.example, .dockerignore — COMPLETE
+- Code review: 7 findings fixed (CR-01 CORS, CR-02 load_dotenv, CR-03 .env guard, WR-01–04)
+- Verification: Docker build verified, container serves API + HTML; PR #4 shipped
 
 ## Completed: Phase 3 — LLM Chat Integration (2026-05-16)
 
@@ -95,8 +102,4 @@ Last Activity: 2026-05-16
 
 ## Next Steps
 
-Execute Phase 5: Docker & Deployment.
-
-```
-/gsd-execute-phase 5
-```
+Plan and execute Phase 6: E2E Testing.

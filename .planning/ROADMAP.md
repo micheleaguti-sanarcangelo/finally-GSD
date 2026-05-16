@@ -90,8 +90,8 @@ Plans:
 **Plans:** 2 plans
 
 Plans:
-- [ ] 05-01-PLAN.md — Multi-stage Dockerfile + FastAPI StaticFiles mount for Next.js export
-- [ ] 05-02-PLAN.md — Start/stop scripts (Mac + Windows), docker-compose.yml, .env.example, .dockerignore
+- [x] 05-01-PLAN.md — Multi-stage Dockerfile + FastAPI StaticFiles mount for Next.js export (COMPLETE 2026-05-16)
+- [x] 05-02-PLAN.md — Start/stop scripts (Mac + Windows), docker-compose.yml, .env.example, .dockerignore (COMPLETE 2026-05-16)
 
 **Success Criteria:**
 - `./scripts/start_mac.sh` builds image and opens `http://localhost:8000`
@@ -128,5 +128,5 @@ Plans:
 | 2 | Portfolio & Trading API | API-01–06, TRADE-01–05 | Complete ✓ |
 | 3 | LLM Chat Integration | API-07, LLM-01–06 | Complete ✓ |
 | 4 | Frontend | UI-01–10 | Complete ✓ |
-| 5 | Docker & Deployment | INFRA-01–06 | Active |
+| 5 | Docker & Deployment | INFRA-01–06 | Complete ✓ |
 | 6 | E2E Testing | TEST-01–07 | Pending |
