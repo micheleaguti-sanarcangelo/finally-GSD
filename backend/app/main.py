@@ -2,6 +2,7 @@
 
 import asyncio
 import logging
+import os
 import sqlite3
 from contextlib import asynccontextmanager
 from pathlib import Path
@@ -9,9 +10,14 @@ from pathlib import Path
 from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
-# Load .env from project root before any env var reads
-load_dotenv(Path(__file__).parent.parent.parent / ".env")
+# Load .env from project root for local development; Docker injects vars via --env-file
+_env_file = Path(__file__).parent.parent.parent / ".env"
+if _env_file.exists():
+    load_dotenv(_env_file)
+
+STATIC_DIR = Path("/app/static")
 
 import app.state as state  # noqa: E402
 from app.api.chat import router as chat_router  # noqa: E402
@@ -38,6 +44,8 @@ async def snapshot_loop() -> None:
 async def lifespan(app: FastAPI):
     """Startup: init DB, start market data, snapshot task. Shutdown: cancel tasks, stop market data."""
     logger.info("Starting FinAlly backend")
+    if not os.environ.get("OPENROUTER_API_KEY"):
+        logger.warning("OPENROUTER_API_KEY is not set — chat endpoint will fail")
     init_db()
     with sqlite3.connect(get_db_path()) as conn:
         rows = conn.execute(
@@ -45,6 +53,8 @@ async def lifespan(app: FastAPI):
         ).fetchall()
     tickers_to_track = [r[0] for r in rows] or list(SEED_PRICES.keys())
     await state.market_source.start(tickers_to_track)
+    # Allow first market tick to populate price cache before snapshotting
+    await asyncio.sleep(1.0)
     try:
         record_portfolio_snapshot(get_db_path(), state.price_cache)
     except Exception:
@@ -65,7 +75,7 @@ app = FastAPI(title="FinAlly", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=["*"],
     allow_methods=["GET", "POST", "DELETE"],
     allow_headers=["*"],
 )
@@ -81,3 +91,9 @@ app.include_router(chat_router, prefix="/api")
 async def health():
     """Health check endpoint."""
     return {"status": "ok"}
+
+
+# Serve static files only when the directory exists (production/Docker)
+# Must be registered after all API routes so /api/* routes take precedence.
+if STATIC_DIR.exists():
+    app.mount("/", StaticFiles(directory=STATIC_DIR, html=True), name="static")

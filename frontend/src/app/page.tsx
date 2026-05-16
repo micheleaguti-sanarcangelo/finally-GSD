@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useSSE } from '@/hooks/useSSE';
 import { Header } from '@/components/Header';
 import { WatchlistPanel } from '@/components/WatchlistPanel';
@@ -26,10 +26,61 @@ type Portfolio = {
   total_value: number;
 };
 
+function DragHandle({ onMouseDown }: { onMouseDown: (e: React.MouseEvent) => void }) {
+  const [hovered, setHovered] = useState(false);
+  return (
+    <div
+      onMouseDown={onMouseDown}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      style={{
+        width: 4,
+        flexShrink: 0,
+        cursor: 'col-resize',
+        backgroundColor: hovered ? '#4a4a5a' : '#2a2a3a',
+        transition: 'background-color 0.15s',
+        userSelect: 'none',
+      }}
+    />
+  );
+}
+
 export default function Home() {
   const [selectedTicker, setSelectedTicker] = useState<string | null>(null);
   const [portfolio, setPortfolio] = useState<Portfolio | null>(null);
   const [historyVersion, setHistoryVersion] = useState(0);
+
+  const [leftWidth, setLeftWidth] = useState(260);
+  const [rightWidth, setRightWidth] = useState(320);
+  const dragging = useRef<'left' | 'right' | null>(null);
+  const dragStartX = useRef(0);
+  const dragStartWidth = useRef(0);
+
+  function startDrag(side: 'left' | 'right', e: React.MouseEvent) {
+    dragging.current = side;
+    dragStartX.current = e.clientX;
+    dragStartWidth.current = side === 'left' ? leftWidth : rightWidth;
+    e.preventDefault();
+  }
+
+  useEffect(() => {
+    function onMouseMove(e: MouseEvent) {
+      if (!dragging.current) return;
+      const delta = e.clientX - dragStartX.current;
+      if (dragging.current === 'left') {
+        setLeftWidth(Math.max(180, Math.min(480, dragStartWidth.current + delta)));
+      } else {
+        setRightWidth(Math.max(240, Math.min(560, dragStartWidth.current - delta)));
+      }
+    }
+    function onMouseUp() { dragging.current = null; }
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseup', onMouseUp);
+    return () => {
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('mouseup', onMouseUp);
+    };
+  }, []);
 
   useSSE();
 
@@ -64,8 +115,8 @@ export default function Home() {
       {/* Three-column content area — fills remaining height */}
       <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
 
-        {/* Left column 260px: watchlist (scrollable) + trade bar (pinned bottom) */}
-        <div style={{ width: 260, display: 'flex', flexDirection: 'column', borderRight: '1px solid #2a2a3a', overflow: 'hidden' }}>
+        {/* Left column: watchlist (scrollable) + trade bar (pinned bottom) */}
+        <div style={{ width: leftWidth, display: 'flex', flexDirection: 'column', overflow: 'hidden', flexShrink: 0 }}>
           <div style={{ flex: 1, overflowY: 'auto' }}>
             <WatchlistPanel
               selectedTicker={selectedTicker}
@@ -79,6 +130,9 @@ export default function Home() {
             />
           </div>
         </div>
+
+        {/* Drag handle: left | center */}
+        <DragHandle onMouseDown={(e) => startDrag('left', e)} />
 
         {/* Center column flex-1: main chart (55%) + positions + P&L chart (45%) */}
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
@@ -95,8 +149,11 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Right column 320px: portfolio heatmap above chat panel */}
-        <div style={{ width: 320, borderLeft: '1px solid #2a2a3a', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+        {/* Drag handle: center | right */}
+        <DragHandle onMouseDown={(e) => startDrag('right', e)} />
+
+        {/* Right column: portfolio heatmap above chat panel */}
+        <div style={{ width: rightWidth, display: 'flex', flexDirection: 'column', overflow: 'hidden', flexShrink: 0 }}>
           <div style={{ height: 200, borderBottom: '1px solid #2a2a3a', padding: 8 }}>
             <PortfolioHeatmap positions={portfolio?.positions ?? []} />
           </div>

@@ -26,9 +26,17 @@
 
 ---
 
+## Completed (continued)
+
+### Phase 4 — Frontend ✓ (2026-05-16)
+**Summary:** Full Next.js trading terminal — all 8 components assembled in three-column layout, SSE live prices, portfolio tracking, AI chat, resizable columns. `npm run build` exits 0, frontend/out/ produced. All 10 UI requirements verified.  
+**Artifacts:** `frontend/src/app/page.tsx`, `frontend/src/components/` (8 components), `frontend/src/hooks/useSSE.ts`
+
+---
+
 ## Active Phases
 
-### Phase 4 — Frontend
+### Phase 4 — Frontend ✓
 **Goal:** Full trading terminal UI in Next.js — all panels functional, connected to the backend via SSE and REST.
 
 **Scope:**
@@ -53,7 +61,7 @@ Plans:
 - [x] 04-02-PLAN.md — Header component + Watchlist panel with price flash and sparklines (COMPLETE 2026-05-16)
 - [x] 04-03-PLAN.md — Trade bar + Positions table + Chat panel (COMPLETE 2026-05-16)
 - [x] 04-04-PLAN.md — Main chart (AreaChart) + Portfolio heatmap (Treemap) + P&L chart (COMPLETE 2026-05-16)
-- [ ] 04-05-PLAN.md — Three-column layout assembly + final build verification
+- [x] 04-05-PLAN.md — Three-column layout assembly + final build verification (COMPLETE 2026-05-16)
 
 **Success Criteria:**
 - `npm run build` produces static export with no errors
@@ -78,6 +86,12 @@ Plans:
 - `.env.example` with placeholder values
 
 **Requirements:** INFRA-01 through INFRA-06
+
+**Plans:** 2 plans
+
+Plans:
+- [x] 05-01-PLAN.md — Multi-stage Dockerfile + FastAPI StaticFiles mount for Next.js export (COMPLETE 2026-05-16)
+- [x] 05-02-PLAN.md — Start/stop scripts (Mac + Windows), docker-compose.yml, .env.example, .dockerignore (COMPLETE 2026-05-16)
 
 **Success Criteria:**
 - `./scripts/start_mac.sh` builds image and opens `http://localhost:8000`
@@ -113,6 +127,6 @@ Plans:
 | 1 | Database & App Foundation | DB-01–07, API-08 | Complete ✓ |
 | 2 | Portfolio & Trading API | API-01–06, TRADE-01–05 | Complete ✓ |
 | 3 | LLM Chat Integration | API-07, LLM-01–06 | Complete ✓ |
-| 4 | Frontend | UI-01–10 | Active |
-| 5 | Docker & Deployment | INFRA-01–06 | Pending |
+| 4 | Frontend | UI-01–10 | Complete ✓ |
+| 5 | Docker & Deployment | INFRA-01–06 | Complete ✓ |
 | 6 | E2E Testing | TEST-01–07 | Pending |
