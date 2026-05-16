@@ -1,0 +1,27 @@
+# Node
+node_modules/
+frontend/.next/
+frontend/out/
+
+# Python
+__pycache__/
+.venv/
+backend/.venv/
+*.pyc
+*.pyo
+
+# Git and IDE
+.git/
+.gitignore
+.env
+*.md
+
+# Database (never bake the DB into the image)
+db/*.db
+db/finally.db
+
+# Planning and test artifacts
+.planning/
+test/
+.claude/
+.gsd/
