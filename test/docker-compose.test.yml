@@ -1,0 +1,37 @@
+services:
+  app:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    environment:
+      - LLM_MOCK=true
+      - OPENROUTER_API_KEY=test-key
+    volumes:
+      - type: tmpfs
+        target: /app/db
+    networks:
+      - test-net
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/health')"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+      start_period: 30s
+
+  playwright:
+    image: mcr.microsoft.com/playwright:v1.52.0-noble
+    working_dir: /tests
+    volumes:
+      - ./:/tests
+    environment:
+      - BASE_URL=http://app:8000
+    command: sh -c "npm install --quiet && npx playwright test"
+    depends_on:
+      app:
+        condition: service_healthy
+    networks:
+      - test-net
+
+networks:
+  test-net:
+    driver: bridge
