@@ -10,7 +10,14 @@ import type { PriceUpdate } from "@/lib/store";
  */
 export function useSSE(): void {
   useEffect(() => {
-    const apiBase = process.env.NEXT_PUBLIC_API_URL ?? "";
+    // In dev (port 3000) connect directly to the backend to bypass the
+    // Next.js proxy, which buffers streaming responses and breaks SSE.
+    // In production FastAPI serves both the static files and the API on
+    // the same origin, so a relative URL is correct.
+    const apiBase =
+      typeof window !== "undefined" && window.location.port === "3000"
+        ? "http://localhost:8000"
+        : "";
     const source = new EventSource(`${apiBase}/api/stream/prices`);
     usePriceStore.getState().setStatus("CONNECTING");
 
