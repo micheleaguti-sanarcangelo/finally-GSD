@@ -29,16 +29,26 @@ export function MainChart({ ticker }: MainChartProps) {
   useEffect(() => {
     if (!prices || Object.keys(prices).length === 0) return;
 
+    // Compute new points outside setState so the ref mutation doesn't run
+    // inside the updater (React 18 StrictMode calls updaters twice with the
+    // same prev, which would cause the timestamp check to skip on the second call).
+    const newPoints: Record<string, { time: number; price: number }> = {};
+    for (const t of Object.keys(prices)) {
+      const update = prices[t];
+      const lastTs = lastTimestampRef.current[t] ?? 0;
+      if (update.timestamp !== lastTs) {
+        lastTimestampRef.current[t] = update.timestamp;
+        newPoints[t] = { time: update.timestamp * 1000, price: update.price };
+      }
+    }
+
+    if (Object.keys(newPoints).length === 0) return;
+
     setPriceHistory((prev) => {
       const next = { ...prev };
-      for (const t of Object.keys(prices)) {
-        const update = prices[t];
-        const lastTs = lastTimestampRef.current[t] ?? 0;
-        if (update.timestamp !== lastTs) {
-          lastTimestampRef.current[t] = update.timestamp;
-          const existing = next[t] ?? [];
-          next[t] = [...existing, { time: update.timestamp * 1000, price: update.price }].slice(-200);
-        }
+      for (const t of Object.keys(newPoints)) {
+        const existing = next[t] ?? [];
+        next[t] = [...existing, newPoints[t]].slice(-200);
       }
       return next;
     });
