@@ -72,6 +72,16 @@
 
 ---
 
+## v1.1 Requirements — Multilingual Chat
+
+### CHAT — Language Awareness
+
+- [ ] **CHAT-01**: AI chat detects the language of the user's message and responds in that same language
+- [ ] **CHAT-02**: Language matching applies to the conversational `message` field and to any trade confirmation / action summaries returned inline
+- [ ] **CHAT-03**: Language detection is transparent — no explicit language selection UI is required
+
+---
+
 ## v2 Requirements
 
 - Real-time candlestick charts (OHLCV data, not just price history)
@@ -146,3 +156,6 @@
 | TEST-05 | Phase 6 | Pending |
 | TEST-06 | Phase 6 | Pending |
 | TEST-07 | Phase 6 | Pending |
+| CHAT-01 | Phase 7 | Pending |
+| CHAT-02 | Phase 7 | Pending |
+| CHAT-03 | Phase 7 | Pending |

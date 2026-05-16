@@ -1,17 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.0
-milestone_name: milestone
-status: shipped
-last_updated: "2026-05-16T18:00:00.000Z"
+milestone: v1.1
+milestone_name: Multilingual Chat
+status: in_progress
+last_updated: "2026-05-16T18:30:00.000Z"
 last_activity: 2026-05-16
-shipped_pr: 5
 progress:
-  total_phases: 6
-  completed_phases: 6
-  total_plans: 21
-  completed_plans: 21
-  percent: 100
+  total_phases: 1
+  completed_phases: 0
+  total_plans: 1
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
@@ -20,50 +19,26 @@ progress:
 **Last Updated:** 2026-05-16  
 **Mode:** YOLO (auto-approve)
 
-## Current Phase
+## Current Position
 
-**Phase 6 — E2E Testing — COMPLETE**  
-Status: Complete (2/2 plans)  
-Last Activity: 2026-05-16
+Phase: Phase 7 — Multilingual Chat
+Plan: —
+Status: Roadmap defined, planning pending
+Last activity: 2026-05-16 — Roadmap created for v1.1
 
-## Completed: Phase 6 — E2E Testing (2026-05-16)
+## Accumulated Context
 
-- Plan 06-01: Test infrastructure — test/package.json, playwright.config.ts, docker-compose.test.yml, 9 data-testid attributes across 4 frontend components, frontend rebuild clean — COMPLETE
-- Plan 06-02: E2E test scenarios — test/tests/finally.spec.ts with all 7 scenarios TEST-01 through TEST-07 — COMPLETE
+### Key Decisions (carried forward)
+- SSE over WebSockets — simpler reconnection, one-way push sufficient
+- SQLite over Postgres — single-user, zero config
+- Static Next.js export — same origin, no CORS, one port
+- uv for Python — fast, reproducible lockfile
+- Market orders only — eliminates order book complexity
+- GBM simulator default — no API key needed for students
+- Language detection via system prompt — LLM handles detection natively, no code-level language parsing needed
 
-## Completed: Phase 5 — Docker & Deployment (2026-05-16)
+### Previous Milestone (v1.0)
+All 6 phases complete and shipped (PR #5). Full trading terminal with live prices, portfolio tracking, AI chat, Docker deployment, and Playwright E2E suite.
 
-- Plan 05-01: Multi-stage Dockerfile (node:20-slim → python:3.12-slim, 199MB), FastAPI StaticFiles mount at `/` — COMPLETE
-- Plan 05-02: start/stop scripts (Mac + Windows), docker-compose.yml, .env.example, .dockerignore — COMPLETE
-- Code review: 7 findings fixed (CR-01 CORS, CR-02 load_dotenv, CR-03 .env guard, WR-01–04)
-- Verification: Docker build verified, container serves API + HTML; PR #4 shipped
-
-## Completed: Phase 3 — LLM Chat Integration (2026-05-16)
-
-- Plan 03-01: POST /api/chat pipeline — litellm, Cerebras/OpenRouter, mock mode, trade/watchlist execution, persistence — COMPLETE
-- Plan 03-02: Router registration in main.py, 9-test pytest suite (110/110 passing) — COMPLETE
-- Code review: 10 findings fixed (3 critical, 5 warnings, 2 info)
-- Verification: 11/11 must-haves verified; 2/2 human UAT tests passed
-
-## Completed: Phase 4 — Frontend (2026-05-16)
-
-- Plan 04-01 through 04-05: Full Next.js trading terminal — all 8 components, three-column layout, SSE, portfolio tracking, AI chat — COMPLETE
-- Verification: 7/7 must-haves verified; human checkpoint approved
-- npm run build exits 0, frontend/out/ produced
-
-## Phase Progress
-
-| Phase | Name | Status |
-|-------|------|--------|
-| ✓ | Market Data Backend | Complete |
-| ✓ | Database & App Foundation | Complete |
-| ✓ | Portfolio & Trading API | Complete |
-| ✓ | LLM Chat Integration | Complete |
-| ✓ | Frontend | Complete |
-| ✓ | Docker & Deployment | Complete |
-| ✓ | E2E Testing | Complete |
-
-## Next Steps
-
-All 6 phases complete. PR #5 shipped — awaiting review and merge.
-https://github.com/micheleaguti-sanarcangelo/finally-GSD/pull/5
+### v1.1 Scope
+Single backend file change: `backend/app/api/chat.py` — update `_build_system_prompt` to instruct the LLM to detect user language from the message and respond in that language. No frontend changes. No new dependencies.
