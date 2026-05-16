@@ -22,6 +22,12 @@ db/finally.db
 
 # Planning and test artifacts
 .planning/
+planning/
 test/
 .claude/
 .gsd/
+
+# Scripts and images (not needed in the container)
+scripts/
+*.png
+*.jpg
