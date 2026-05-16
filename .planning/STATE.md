@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: In Progress
-last_updated: "2026-05-16T00:20:00.000Z"
+status: executing
+last_updated: "2026-05-16T08:10:00.000Z"
 last_activity: 2026-05-16
 progress:
   total_phases: 4
   completed_phases: 3
   total_plans: 12
-  completed_plans: 9
-  percent: 75
+  completed_plans: 10
+  percent: 83
 ---
 
 # Project State
@@ -22,7 +22,7 @@ progress:
 ## Current Phase
 
 **Phase 4 — Frontend**  
-Status: In Progress (Plan 1/5 complete)  
+Status: In Progress (Plan 2/5 complete)  
 Last Activity: 2026-05-16
 
 ## Completed: Phase 3 — LLM Chat Integration (2026-05-16)
@@ -41,6 +41,12 @@ Last Activity: 2026-05-16
 - useSSE hook connecting EventSource to /api/stream/prices with error handling
 - Build: `npm run build` exits 0, frontend/out/ produced
 
+## Completed: Phase 4 Plan 02 — Header, Sparkline, WatchlistPanel (2026-05-16)
+
+- Header.tsx: live portfolio value, cash balance, SSE connection status dot (green/yellow/red)
+- Sparkline.tsx: pure SVG polyline from price array, min/max normalization, no library
+- WatchlistPanel.tsx: live prices from Zustand, price flash 500ms, sparkline history (60-point cap), add/remove ticker
+
 ## Phase Progress
 
 | Phase | Name | Status |
@@ -49,7 +55,7 @@ Last Activity: 2026-05-16
 | ✓ | Database & App Foundation | Complete |
 | ✓ | Portfolio & Trading API | Complete |
 | ✓ | LLM Chat Integration | Complete |
-| 4 | Frontend | In Progress (1/5) |
+| 4 | Frontend | In Progress (2/5) |
 | 5 | Docker & Deployment | Not Started |
 | 6 | E2E Testing | Not Started |
 
@@ -58,10 +64,13 @@ Last Activity: 2026-05-16
 - Use `next.config.mjs` (not .ts) — Next.js 14 does not support TypeScript config files
 - Zustand price store uses `getState()` inside SSE event handlers (not hook) to avoid stale closure issues
 - `lib/` in root .gitignore scoped to `/lib/` to avoid matching frontend/src/lib/
+- Sparkline is a pure function component (no 'use client') — no browser APIs, props-only
+- Flash timers stored in useRef to avoid re-renders when clearing; unmount effect clears all timers
+- Ticker input sanitized with toUpperCase().trim() + maxLength=10 per threat model T-04-03
 
 ## Next Steps
 
-Run plan 04-02: Header component + Watchlist panel with price flash and sparklines.
+Run plan 04-03: Trade bar and Chat panel.
 
 ```
 /gsd-execute-phase 4
