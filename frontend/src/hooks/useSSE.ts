@@ -10,7 +10,8 @@ import type { PriceUpdate } from "@/lib/store";
  */
 export function useSSE(): void {
   useEffect(() => {
-    const source = new EventSource("/api/stream/prices");
+    const apiBase = process.env.NEXT_PUBLIC_API_URL ?? "";
+    const source = new EventSource(`${apiBase}/api/stream/prices`);
     usePriceStore.getState().setStatus("CONNECTING");
 
     source.onopen = () => {
