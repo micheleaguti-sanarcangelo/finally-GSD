@@ -2,9 +2,10 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: complete
-last_updated: "2026-05-16T16:00:00.000Z"
+status: shipped
+last_updated: "2026-05-16T18:00:00.000Z"
 last_activity: 2026-05-16
+shipped_pr: 5
 progress:
   total_phases: 6
   completed_phases: 6
@@ -64,4 +65,5 @@ Last Activity: 2026-05-16
 
 ## Next Steps
 
-All 6 phases complete. Milestone v1.0 ready for audit/ship.
+All 6 phases complete. PR #5 shipped — awaiting review and merge.
+https://github.com/micheleaguti-sanarcangelo/finally-GSD/pull/5
