@@ -8,6 +8,7 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 # Load .env from project root before any env var reads
 load_dotenv(Path(__file__).parent.parent.parent / ".env")
@@ -61,6 +62,13 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(title="FinAlly", lifespan=lifespan)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],
+    allow_methods=["GET", "POST", "DELETE"],
+    allow_headers=["*"],
+)
 
 stream_router = create_stream_router(state.price_cache)
 app.include_router(stream_router)

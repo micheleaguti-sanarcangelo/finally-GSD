@@ -16,65 +16,17 @@
 **Summary:** SQLite lazy-init DB module (6 tables, idempotent seeding), FastAPI app entrypoint with lifespan, health endpoint, SSE router wiring. 78 tests passing.  
 **Artifacts:** `backend/app/db/` (init module), `backend/app/main.py`, `backend/tests/db/` (5 tests)
 
+### Phase 2 — Portfolio & Trading API ✓ (2026-05-15)
+**Summary:** Full REST API for portfolio management, trade execution, and watchlist CRUD. Market orders with cash/share validation, avg_cost calculation, portfolio snapshot background task. 110 tests passing.  
+**Artifacts:** `backend/app/api/portfolio.py`, `backend/app/api/watchlist.py`, `backend/tests/api/`
+
+### Phase 3 — LLM Chat Integration ✓ (2026-05-16)
+**Summary:** POST /api/chat pipeline with LiteLLM → OpenRouter → Cerebras (gpt-oss-120b), structured output, auto-execute trades and watchlist changes, LLM_MOCK mode, conversation history, 9 pytest tests. All 11 verification items + 2 human UAT tests passed.  
+**Artifacts:** `backend/app/api/chat.py`, `backend/tests/api/test_chat.py`
+
 ---
 
 ## Active Phases
-
-### Phase 2 — Portfolio & Trading API
-**Goal:** Full REST API for portfolio management, trade execution, and watchlist CRUD — the complete backend minus chat.
-
-**Scope:**
-- Trade execution: market orders, cash/share validation, avg_cost calculation
-- `GET /api/portfolio`, `POST /api/portfolio/trade`, `GET /api/portfolio/history`
-- `GET /api/watchlist`, `POST /api/watchlist`, `DELETE /api/watchlist/{ticker}`
-- Portfolio snapshot background task (every 30s + after each trade)
-- Watchlist changes propagate to market data source (add/remove tickers from price tracking)
-
-**Requirements:** API-01 through API-06, TRADE-01 through TRADE-05
-
-**Success Criteria:**
-- Can buy 10 AAPL shares via `POST /api/portfolio/trade`; cash decreases, position appears in `GET /api/portfolio`
-- Sell validation rejects selling more than owned
-- Buy validation rejects insufficient cash
-- `GET /api/portfolio/history` returns snapshot entries accumulating over time
-- Adding a ticker via `POST /api/watchlist` starts streaming its price
-- Backend unit tests cover trade logic and P&L calculations
-
----
-
-### Phase 3 — LLM Chat Integration
-**Goal:** AI chat endpoint that understands portfolio context, returns structured JSON, auto-executes trades and watchlist changes, and supports mock mode.
-
-**Scope:**
-- `POST /api/chat` — full pipeline: load context → history → call LLM → parse → execute → store → return
-- LiteLLM → OpenRouter → Cerebras (`openrouter/openai/gpt-oss-120b`) with structured outputs
-- Structured output schema: `{message, trades[], watchlist_changes[]}`
-- System prompt with live portfolio context (cash, positions with P&L, watchlist prices)
-- Auto-execute trades and watchlist changes from response
-- `LLM_MOCK=true` deterministic mock response
-- Conversation history from `chat_messages` table
-
-**Requirements:** API-07, LLM-01 through LLM-06
-
-**Plans:** 2 plans
-
-**Wave 1**
-- [ ] 03-01-PLAN.md — Add litellm dependency and implement backend/app/api/chat.py (full LLM pipeline)
-
-**Wave 2** *(blocked on Wave 1 completion)*
-- [ ] 03-02-PLAN.md — Register chat router in main.py and write pytest test suite
-
-**Cross-cutting constraints:**
-- HTTP 200 always returned from POST /api/chat — no HTTPException raised in chat.py (D-01)
-- State singletons accessed via `import app.state as state` attribute pattern (mock.patch compatible)
-
-**Success Criteria:**
-- `POST /api/chat {"message": "buy 5 AAPL"}` returns structured JSON and executes the trade
-- `LLM_MOCK=true` returns consistent mock response without calling OpenRouter
-- Failed trades (insufficient cash) are reported in the response message
-- Conversation history is maintained across multiple chat calls
-
----
 
 ### Phase 4 — Frontend
 **Goal:** Full trading terminal UI in Next.js — all panels functional, connected to the backend via SSE and REST.
@@ -83,7 +35,7 @@
 - Next.js TypeScript project with static export (`output: 'export'`)
 - Tailwind CSS dark theme (bg `#0d1117`, accents per spec)
 - Watchlist panel with price flash animations and sparklines
-- Main chart area (Lightweight Charts or Recharts) for selected ticker
+- Main chart area (Recharts AreaChart) for selected ticker
 - Portfolio heatmap/treemap (positions by weight, colored by P&L)
 - P&L line chart from `/api/portfolio/history`
 - Positions table
@@ -93,6 +45,15 @@
 - SSE `EventSource` with auto-reconnect
 
 **Requirements:** UI-01 through UI-10
+
+**Plans:** 5 plans
+
+Plans:
+- [x] 04-01-PLAN.md — Next.js scaffold, Tailwind config, Zustand price store, useSSE hook (COMPLETE 2026-05-16)
+- [x] 04-02-PLAN.md — Header component + Watchlist panel with price flash and sparklines (COMPLETE 2026-05-16)
+- [x] 04-03-PLAN.md — Trade bar + Positions table + Chat panel (COMPLETE 2026-05-16)
+- [x] 04-04-PLAN.md — Main chart (AreaChart) + Portfolio heatmap (Treemap) + P&L chart (COMPLETE 2026-05-16)
+- [ ] 04-05-PLAN.md — Three-column layout assembly + final build verification
 
 **Success Criteria:**
 - `npm run build` produces static export with no errors
@@ -150,8 +111,8 @@
 |-------|------|-------------|--------|
 | ✓ | Market Data Backend | Market data, SSE, cache, tests | Complete |
 | 1 | Database & App Foundation | DB-01–07, API-08 | Complete ✓ |
-| 2 | Portfolio & Trading API | API-01–06, TRADE-01–05 | Pending |
-| 3 | LLM Chat Integration | API-07, LLM-01–06 | Pending |
-| 4 | Frontend | UI-01–10 | Pending |
+| 2 | Portfolio & Trading API | API-01–06, TRADE-01–05 | Complete ✓ |
+| 3 | LLM Chat Integration | API-07, LLM-01–06 | Complete ✓ |
+| 4 | Frontend | UI-01–10 | Active |
 | 5 | Docker & Deployment | INFRA-01–06 | Pending |
 | 6 | E2E Testing | TEST-01–07 | Pending |
