@@ -26,9 +26,17 @@
 
 ---
 
+## Completed (continued)
+
+### Phase 4 — Frontend ✓ (2026-05-16)
+**Summary:** Full Next.js trading terminal — all 8 components assembled in three-column layout, SSE live prices, portfolio tracking, AI chat, resizable columns. `npm run build` exits 0, frontend/out/ produced. All 10 UI requirements verified.  
+**Artifacts:** `frontend/src/app/page.tsx`, `frontend/src/components/` (8 components), `frontend/src/hooks/useSSE.ts`
+
+---
+
 ## Active Phases
 
-### Phase 4 — Frontend
+### Phase 4 — Frontend ✓
 **Goal:** Full trading terminal UI in Next.js — all panels functional, connected to the backend via SSE and REST.
 
 **Scope:**
@@ -53,7 +61,7 @@ Plans:
 - [x] 04-02-PLAN.md — Header component + Watchlist panel with price flash and sparklines (COMPLETE 2026-05-16)
 - [x] 04-03-PLAN.md — Trade bar + Positions table + Chat panel (COMPLETE 2026-05-16)
 - [x] 04-04-PLAN.md — Main chart (AreaChart) + Portfolio heatmap (Treemap) + P&L chart (COMPLETE 2026-05-16)
-- [ ] 04-05-PLAN.md — Three-column layout assembly + final build verification
+- [x] 04-05-PLAN.md — Three-column layout assembly + final build verification (COMPLETE 2026-05-16)
 
 **Success Criteria:**
 - `npm run build` produces static export with no errors
