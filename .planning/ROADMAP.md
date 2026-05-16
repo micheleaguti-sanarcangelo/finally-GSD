@@ -35,7 +35,7 @@
 - Next.js TypeScript project with static export (`output: 'export'`)
 - Tailwind CSS dark theme (bg `#0d1117`, accents per spec)
 - Watchlist panel with price flash animations and sparklines
-- Main chart area (Lightweight Charts or Recharts) for selected ticker
+- Main chart area (Recharts AreaChart) for selected ticker
 - Portfolio heatmap/treemap (positions by weight, colored by P&L)
 - P&L line chart from `/api/portfolio/history`
 - Positions table
@@ -45,6 +45,15 @@
 - SSE `EventSource` with auto-reconnect
 
 **Requirements:** UI-01 through UI-10
+
+**Plans:** 5 plans
+
+Plans:
+- [ ] 04-01-PLAN.md — Next.js scaffold, Tailwind config, Zustand price store, useSSE hook
+- [ ] 04-02-PLAN.md — Header component + Watchlist panel with price flash and sparklines
+- [ ] 04-03-PLAN.md — Trade bar + Positions table + Chat panel
+- [ ] 04-04-PLAN.md — Main chart (AreaChart) + Portfolio heatmap (Treemap) + P&L chart
+- [ ] 04-05-PLAN.md — Three-column layout assembly + final build verification
 
 **Success Criteria:**
 - `npm run build` produces static export with no errors
@@ -104,6 +113,6 @@
 | 1 | Database & App Foundation | DB-01–07, API-08 | Complete ✓ |
 | 2 | Portfolio & Trading API | API-01–06, TRADE-01–05 | Complete ✓ |
 | 3 | LLM Chat Integration | API-07, LLM-01–06 | Complete ✓ |
-| 4 | Frontend | UI-01–10 | Pending |
+| 4 | Frontend | UI-01–10 | Active |
 | 5 | Docker & Deployment | INFRA-01–06 | Pending |
 | 6 | E2E Testing | TEST-01–07 | Pending |
