@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-last_updated: "2026-05-16T08:30:00.000Z"
+last_updated: "2026-05-16T08:06:27.574Z"
 last_activity: 2026-05-16
 progress:
   total_phases: 4
   completed_phases: 3
   total_plans: 12
-  completed_plans: 11
-  percent: 92
+  completed_plans: 12
+  percent: 100
 ---
 
 # Project State
@@ -22,7 +22,7 @@ progress:
 ## Current Phase
 
 **Phase 4 — Frontend**  
-Status: In Progress (Plan 3/5 complete)  
+Status: In Progress (Plan 4/5 complete)  
 Last Activity: 2026-05-16
 
 ## Completed: Phase 3 — LLM Chat Integration (2026-05-16)
@@ -53,6 +53,13 @@ Last Activity: 2026-05-16
 - PositionsTable.tsx: live prices from Zustand, recomputed P&L inline, empty state message
 - ChatPanel.tsx: AI conversation history, loading gate, inline trade/watchlist confirmation pills, Enter-to-submit, auto-scroll
 
+## Completed: Phase 4 Plan 04 — Charts: MainChart, PortfolioHeatmap, PnLChart (2026-05-16)
+
+- MainChart.tsx: SSE price history accumulated per ticker (200-point cap), Recharts AreaChart, blue gradient (#209dd7), isAnimationActive=false
+- PortfolioHeatmap.tsx: Recharts Treemap with custom SVG cell renderer, live-price market value sizing, green (#16a34a)/red (#dc2626) P&L coloring
+- PnLChart.tsx: fetches /api/portfolio/history, re-fetches on historyVersion increment, accent-yellow gradient (#ecad0a)
+- TypeScript: npx tsc --noEmit exits 0 for all three files
+
 ## Phase Progress
 
 | Phase | Name | Status |
@@ -61,7 +68,7 @@ Last Activity: 2026-05-16
 | ✓ | Database & App Foundation | Complete |
 | ✓ | Portfolio & Trading API | Complete |
 | ✓ | LLM Chat Integration | Complete |
-| 4 | Frontend | In Progress (3/5) |
+| 4 | Frontend | In Progress (4/5) |
 | 5 | Docker & Deployment | Not Started |
 | 6 | E2E Testing | Not Started |
 
@@ -76,10 +83,13 @@ Last Activity: 2026-05-16
 - TradeBar keeps ticker/quantity fields after successful trade (facilitates repeat trades same ticker)
 - PositionsTable ignores unrealized_pnl prop — recomputes live from Zustand prices to avoid staleness
 - ChatPanel shows generic error on fetch failure; no detail exposure (T-04-07)
+- SVG defs/linearGradient/stop used as native JSX SVG elements (not recharts exports) for gradient fills
+- priceHistory accumulation uses useRef for last-seen timestamp to prevent duplicate data points
+- Treemap data passed as flat array to recharts 2.x (not nested with root children wrapper)
 
 ## Next Steps
 
-Run plan 04-04: Charts (MainChart, PortfolioHeatmap, PnLChart).
+Run plan 04-05: Layout assembly (assemble all components into the main page).
 
 ```
 /gsd-execute-phase 4
