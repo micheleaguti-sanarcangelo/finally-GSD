@@ -25,6 +25,7 @@ export function MainChart({ ticker }: MainChartProps) {
   const [priceHistory, setPriceHistory] = useState<Record<string, PricePoint[]>>({});
   const lastTimestampRef = useRef<Record<string, number>>({});
 
+  // Accumulate price history from SSE for all tickers
   useEffect(() => {
     if (!prices || Object.keys(prices).length === 0) return;
 
@@ -42,6 +43,18 @@ export function MainChart({ ticker }: MainChartProps) {
       return next;
     });
   }, [prices]);
+
+  // Seed a starting point when the selected ticker changes so the chart
+  // appears after one SSE tick instead of two
+  useEffect(() => {
+    if (!ticker || !prices[ticker]) return;
+    setPriceHistory((prev) => {
+      if ((prev[ticker]?.length ?? 0) > 0) return prev;
+      const p = prices[ticker];
+      return { ...prev, [ticker]: [{ time: p.timestamp * 1000, price: p.price }] };
+    });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ticker]);
 
   const currentPrice = ticker ? prices[ticker]?.price : null;
   const history = ticker ? (priceHistory[ticker] ?? []) : [];
