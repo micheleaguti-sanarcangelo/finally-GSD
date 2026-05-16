@@ -49,7 +49,7 @@
 **Plans:** 5 plans
 
 Plans:
-- [ ] 04-01-PLAN.md — Next.js scaffold, Tailwind config, Zustand price store, useSSE hook
+- [x] 04-01-PLAN.md — Next.js scaffold, Tailwind config, Zustand price store, useSSE hook (COMPLETE 2026-05-16)
 - [ ] 04-02-PLAN.md — Header component + Watchlist panel with price flash and sparklines
 - [ ] 04-03-PLAN.md — Trade bar + Positions table + Chat panel
 - [ ] 04-04-PLAN.md — Main chart (AreaChart) + Portfolio heatmap (Treemap) + P&L chart
