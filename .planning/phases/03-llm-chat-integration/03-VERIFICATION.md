@@ -94,7 +94,7 @@ All nine fix items were confirmed in the codebase:
 
 | From | To | Via | Status | Details |
 |------|----|-----|--------|---------|
-| `backend/app/api/chat.py` | `litellm.completion` | MODEL=openrouter/openai/gpt-oss-120b, EXTRA_BODY with cerebras provider | VERIFIED | Lines 138-144; MODEL and EXTRA_BODY constants at lines 22-23 |
+| `backend/app/api/chat.py` | `litellm.completion` | MODEL=openrouter/openai/gpt-oss-120b:free, EXTRA_BODY with cerebras provider | VERIFIED | Lines 138-144; MODEL and EXTRA_BODY constants at lines 22-23 |
 | `backend/app/api/chat.py` | `app.api.portfolio.record_portfolio_snapshot` | import at line 16, call at line 250 | VERIFIED | `from app.api.portfolio import record_portfolio_snapshot` + `record_portfolio_snapshot(db_path, state.price_cache)` |
 | `backend/app/api/chat.py` | `app.state.price_cache` | import app.state as state; attribute access | VERIFIED | Line 15: `import app.state as state`; used as state.price_cache at lines 128, 171, 250 |
 | `backend/app/main.py` | `backend/app/api/chat.py` | from app.api.chat import router as chat_router | VERIFIED | Lines 16 and 69 confirmed |

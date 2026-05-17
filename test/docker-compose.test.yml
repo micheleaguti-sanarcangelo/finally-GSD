@@ -25,7 +25,12 @@ services:
       - ./:/tests
     environment:
       - BASE_URL=http://app:8000
-    command: sh -c "npm install --quiet && npx playwright test"
+    command: >-
+      sh -c "npm install --quiet &&
+      until wget -q -O /dev/null http://app:8000/api/health 2>/dev/null;
+        do echo 'waiting for app...' && sleep 2;
+      done &&
+      npx playwright test"
     depends_on:
       app:
         condition: service_healthy

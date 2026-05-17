@@ -1,5 +1,6 @@
 """LLM chat API route."""
 
+import asyncio
 import json
 import logging
 import os
@@ -19,7 +20,7 @@ from app.db import get_db_path
 router = APIRouter(tags=["chat"])
 logger = logging.getLogger(__name__)
 
-MODEL = "openrouter/openai/gpt-oss-120b"
+MODEL = "openrouter/openai/gpt-oss-120b:free"
 EXTRA_BODY = {"provider": {"order": ["cerebras"]}}
 
 
@@ -114,6 +115,7 @@ async def chat(req: ChatRequest):
 
     # D-10: mock check — skip LLM call, but still execute and persist
     if os.getenv("LLM_MOCK", "").lower() == "true":
+        await asyncio.sleep(0.5)  # keep "Thinking..." visible long enough for E2E tests
         result = LLMResponse(
             message="Mock: I'll buy 1 AAPL for you and add PYPL to your watchlist.",
             trades=[TradeAction(ticker="AAPL", side="buy", quantity=1)],
@@ -144,7 +146,6 @@ async def chat(req: ChatRequest):
                 model=MODEL,
                 messages=messages,
                 response_format=LLMResponse,
-                reasoning_effort="low",
                 extra_body=EXTRA_BODY,
             )
             result = LLMResponse.model_validate_json(response.choices[0].message.content)
