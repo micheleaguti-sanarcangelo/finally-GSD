@@ -1,5 +1,16 @@
 # FinAlly — AI Trading Workstation
 
+## Current Milestone: v1.1 Multilingual Chat
+
+**Goal:** AI chat detects the language of the user's message and responds in the same language.
+
+**Target features:**
+- Language-aware system prompt: LLM detects and matches user language automatically
+- Supports any language the underlying model handles (Italian, English, French, Spanish, etc.)
+- No frontend changes required — backend-only system prompt update
+
+---
+
 ## What This Is
 
 FinAlly (Finance Ally) is a Bloomberg-terminal-inspired AI trading workstation. Users watch live-streaming prices for a configurable watchlist, trade a simulated $10k portfolio with market orders, and chat with an LLM assistant that analyzes positions and executes trades on command. Built as the capstone for an agentic AI coding course — the entire platform is built by orchestrated AI agents.
@@ -19,20 +30,23 @@ A single Docker command launches a fully functional trading terminal with live p
 - ✓ Abstract `MarketDataSource` interface (strategy pattern)
 - ✓ 73 passing tests, 84% coverage across 6 test modules
 
-### Active
-- [ ] SQLite lazy initialization (6 tables, seed data on fresh start)
-- [ ] Portfolio & trading REST API (positions, cash, P&L, trade execution)
-- [ ] Watchlist CRUD API
-- [ ] Portfolio snapshot background task (every 30s + after each trade)
-- [ ] LLM chat with structured output (message + trades[] + watchlist_changes[])
-- [ ] Auto-execution of trades and watchlist changes from LLM response
-- [ ] LLM mock mode (`LLM_MOCK=true`) for deterministic testing
-- [ ] Next.js frontend: watchlist panel, main chart, heatmap, P&L chart, positions table, trade bar, chat panel, header
-- [ ] Price flash animations (green/red CSS transitions, ~500ms)
-- [ ] Sparkline mini-charts accumulated from SSE since page load
-- [ ] Multi-stage Dockerfile (Node 20 → Python 3.12)
-- [ ] Start/stop scripts (Mac shell + Windows PowerShell)
-- [ ] E2E Playwright test suite (7 key scenarios)
+### Active (v1.1)
+- [ ] AI chat detects user language and responds in the same language (system prompt)
+
+### Validated (v1.0)
+- ✓ SQLite lazy initialization (6 tables, seed data on fresh start)
+- ✓ Portfolio & trading REST API (positions, cash, P&L, trade execution)
+- ✓ Watchlist CRUD API
+- ✓ Portfolio snapshot background task (every 30s + after each trade)
+- ✓ LLM chat with structured output (message + trades[] + watchlist_changes[])
+- ✓ Auto-execution of trades and watchlist changes from LLM response
+- ✓ LLM mock mode (`LLM_MOCK=true`) for deterministic testing
+- ✓ Next.js frontend: watchlist panel, main chart, heatmap, P&L chart, positions table, trade bar, chat panel, header
+- ✓ Price flash animations (green/red CSS transitions, ~500ms)
+- ✓ Sparkline mini-charts accumulated from SSE since page load
+- ✓ Multi-stage Dockerfile (Node 20 → Python 3.12)
+- ✓ Start/stop scripts (Mac shell + Windows PowerShell)
+- ✓ E2E Playwright test suite (7 key scenarios)
 
 ### Out of Scope
 - User authentication / multi-user (schema has user_id but hardcoded to "default")
@@ -72,4 +86,22 @@ A single Docker command launches a fully functional trading terminal with live p
 
 ---
 
-*Evolution: After each phase — move completed reqs to Validated, log decisions. After each milestone — full review.*
+## Evolution
+
+This document evolves at phase transitions and milestone boundaries.
+
+**After each phase transition** (via `/gsd-transition`):
+1. Requirements invalidated? → Move to Out of Scope with reason
+2. Requirements validated? → Move to Validated with phase reference
+3. New requirements emerged? → Add to Active
+4. Decisions to log? → Add to Key Decisions
+
+**After each milestone** (via `/gsd-complete-milestone`):
+1. Full review of all sections
+2. Core Value check — still the right priority?
+3. Audit Out of Scope — reasons still valid?
+4. Update Context with current state
+
+---
+
+*Last updated: 2026-05-16 — v1.1 Multilingual Chat milestone started*
