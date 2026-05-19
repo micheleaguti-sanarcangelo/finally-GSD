@@ -39,7 +39,7 @@ from app.db import get_db_path
 
 router = APIRouter(tags=["chat"])
 
-MODEL = "openrouter/openai/gpt-oss-120b"
+MODEL = "openrouter/openai/gpt-oss-120b:free"
 EXTRA_BODY = {"provider": {"order": ["cerebras"]}}
 ```
 
@@ -340,7 +340,7 @@ datetime.now(timezone.utc).isoformat()
 **Apply to:** `chat.py` LLM call block
 ```python
 from litellm import completion
-MODEL = "openrouter/openai/gpt-oss-120b"
+MODEL = "openrouter/openai/gpt-oss-120b:free"
 EXTRA_BODY = {"provider": {"order": ["cerebras"]}}
 
 response = completion(

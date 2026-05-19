@@ -64,7 +64,7 @@ This is purely backend. Six requirements: API-07 and LLM-01 through LLM-06.
 - `.planning/REQUIREMENTS.md` §API (API-07) — chat endpoint requirement
 
 ### LLM Integration Pattern
-- `.claude/skills/cerebras/SKILL.md` — exact LiteLLM call pattern: `MODEL = "openrouter/openai/gpt-oss-120b"`, `EXTRA_BODY = {"provider": {"order": ["cerebras"]}}`, structured output via `response_format=MyBaseModelSubclass`, `reasoning_effort="low"`
+- `.claude/skills/cerebras/SKILL.md` — exact LiteLLM call pattern: `MODEL = "openrouter/openai/gpt-oss-120b:free"`, `EXTRA_BODY = {"provider": {"order": ["cerebras"]}}`, structured output via `response_format=MyBaseModelSubclass`, `reasoning_effort="low"`
 
 ### Existing Backend Code
 - `backend/app/api/portfolio.py` — `record_portfolio_snapshot()` (import and reuse); trade execution DB logic (replicate for LLM-triggered trades)

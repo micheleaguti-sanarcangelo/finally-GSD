@@ -69,7 +69,7 @@ A single Docker command launches a fully functional trading terminal with live p
 - **Static Next.js export** (`output: 'export'`) served by FastAPI
 - **SQLite** — no Postgres, self-contained, zero config
 - **SSE not WebSockets** — one-way push, simpler, universal browser support
-- **OpenRouter + Cerebras** for LLM via LiteLLM (`openrouter/openai/gpt-oss-120b`)
+- **OpenRouter + Cerebras** for LLM via LiteLLM (`openrouter/openai/gpt-oss-120b:free`)
 - **No emojis** in code or print statements
 
 ## Key Decisions
